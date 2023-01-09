@@ -2,10 +2,159 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider = "prisma-client-js"
+    provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+enum UserStatus {
+    ACTIVE
+    INACTIVE
+}
+
+model User {
+    id String @id @unique @default(uuid())
+
+    name     String
+    email    String @unique
+    password String
+
+    status     UserStatus @default(ACTIVE)
+    created_at DateTime   @default(now())
+    updated_at DateTime   @updatedAt
+
+    registerRole           UsersOnRoles[]
+    registerAdjuster       UsersOnRoles[]     @relation("FK_adjuster")
+    linked_sector          OrganizationSector @relation(fields: [organization_sector_id], references: [id])
+    organization_sector_id String
+    ActivitiesResponsible  Activity[]
+    Collaborators          Collaborators[]
+    Annex                  Annex[]
+    MessageAtivity         MessageAtivity[]
+
+    @@map("users")
+}
+
+model Role {
+    id String @id @unique @default(uuid())
+
+    name        String  @unique
+    description String?
+
+    created_at   DateTime       @default(now())
+    updated_at   DateTime       @updatedAt
+    usersOnRoles UsersOnRoles[]
+
+    @@map("roles")
+}
+
+model UsersOnRoles {
+    userId  User   @relation(fields: [user_id], references: [id])
+    user_id String
+    roleId  Role   @relation(fields: [role_id], references: [id])
+    role_id String
+
+    created_at  DateTime @default(now())
+    adjuster    User     @relation("FK_adjuster", fields: [adjuster_id], references: [id])
+    adjuster_id String
+
+    @@id([user_id, role_id])
+    @@map("users_on_roles")
+}
+
+model Organization {
+    id                  String @id @unique @default(uuid())
+    name                String @unique
+    employees_allocated Int    @default(0)
+
+    created_at         DateTime             @default(now())
+    updated_at         DateTime             @updatedAt
+    OrganizationSector OrganizationSector[]
+}
+
+model OrganizationSector {
+    id   String @id @unique @default(uuid())
+    name String @unique
+
+    created_at          DateTime @default(now())
+    updated_at          DateTime @updatedAt
+    employees_allocated Int      @default(0)
+
+    organizationId  Organization @relation(fields: [organization_id], references: [id])
+    organization_id String
+
+    User User[]
+}
+
+model Activity {
+    id String @id @unique @default(uuid())
+
+    title       String
+    description String?
+
+    created_at DateTime  @default(now())
+    updated_at DateTime  @updatedAt
+    due_data   DateTime?
+
+    Responsible    User   @relation(fields: [responsible_id], references: [id])
+    responsible_id String
+
+    progress_status ProgressStatusActivity @default(DO_TO)
+
+    ParentActivity       Activity?        @relation("FK_dependenceActivity", fields: [parent_activity_id], references: [id])
+    ActivityDependencies Activity[]       @relation("FK_dependenceActivity")
+    parent_activity_id   String?
+    dependency_link_date DateTime?        @default(now())
+    Collaborators        Collaborators[]
+    Annex                Annex[]
+    MessageAtivity       MessageAtivity[]
+}
+
+enum ProgressStatusActivity {
+    DO_TO
+    CLOSED
+}
+
+model Collaborators {
+    user        User     @relation(fields: [user_id], references: [id])
+    user_id     String
+    activity    Activity @relation(fields: [activity_id], references: [id])
+    activity_id String
+
+    @@id([user_id, activity_id])
+}
+
+model Annex {
+    original_name    String
+    publication_date DateTime @default(now())
+    file_name        String   @unique
+    url              String
+
+    CorrelationActivity Activity @relation(fields: [activity_id], references: [id])
+    activity_id         String
+    Publisher           User     @relation(fields: [user_id], references: [id])
+    user_id             String
+
+    @@id([activity_id, user_id])
+}
+
+model MessageAtivity {
+    content          String
+    publication_date DateTime    @default(now())
+    type_message     TypeMessage
+
+    CorrelationActivity Activity @relation(fields: [activity_id], references: [id])
+    activity_id         String
+    Publisher           User     @relation(fields: [user_id], references: [id])
+    user_id             String
+
+    @@id([activity_id, user_id])
+}
+
+enum TypeMessage {
+    SYSTEM
+    USER
 }

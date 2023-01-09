@@ -16,8 +16,7 @@ export class CreateUserUseCase {
             return new Error('User alread existed')
         }
 
-        const { name, email, status, created_at, updated_at, organization_sector_id } = data
-        const password = await hash(data.password, 8)
+        const { name, email, status, password, created_at, updated_at, organization_sector_id } = data;
 
         const user = User.create({
             name,

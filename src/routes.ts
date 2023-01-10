@@ -1,6 +1,7 @@
 import { Request, Response, Router } from 'express';
 import { createUserController } from './application/usecases/createUser';
 import { sessionLoginController } from './application/usecases/sessionLogin';
+import { createRoleController } from './application/usecases/createRole';
 
 const routes = Router();
 
@@ -19,6 +20,12 @@ routes.post('/users', (req: Request, res: Response) => {
 
 routes.post('/login', (req: Request, res: Response) => {
     return sessionLoginController.handle(req, res);
+});
+
+//routes role
+
+routes.post('/roles', (req: Request, res: Response) => {
+    return createRoleController.handle(req, res);
 });
 
 export { routes };

@@ -2,6 +2,11 @@ import { Request, Response, Router } from 'express';
 import { createUserController } from './application/usecases/createUser';
 import { sessionLoginController } from './application/usecases/sessionLogin';
 import { createRoleController } from './application/usecases/createRole';
+import { isAuthenticated } from './middlewares/isAuthenticated';
+import { isAllowed } from './middlewares/isAllowed';
+import { createRecordRoleController } from './application/usecases/createRecordRole';
+import { getUserByIdController } from './application/usecases/getUserById';
+import { getAllUsersController } from './application/usecases/getAllUsers';
 
 const routes = Router();
 
@@ -12,8 +17,20 @@ routes.get('/', (req: Request, res: Response) => {
 })
 
 //rotes user
-routes.post('/users', (req: Request, res: Response) => {
+routes.get('/users', isAuthenticated(), isAllowed(['Funcionario']), (req: Request, res: Response) => {
+    return getAllUsersController.handle(req, res);
+});
+
+routes.get('/user', isAuthenticated(), (req: Request, res: Response) => {
+    return getUserByIdController.handle(req, res);
+});
+
+routes.post('/users', isAuthenticated(), isAllowed(['Funcionario']), (req: Request, res: Response) => {
     return createUserController.handle(req, res);
+});
+
+routes.post('/user/roles', isAuthenticated(), (req: Request, res: Response) => {
+    return createRecordRoleController.handle(req, res);
 });
 
 //routes login
@@ -24,7 +41,7 @@ routes.post('/login', (req: Request, res: Response) => {
 
 //routes role
 
-routes.post('/roles', (req: Request, res: Response) => {
+routes.post('/roles', isAuthenticated(), (req: Request, res: Response) => {
     return createRoleController.handle(req, res);
 });
 

@@ -1,6 +1,6 @@
 import { PrismaUserOnRolesRepository } from "../../repositories/implemention/PrismaUserOnRolesRepository";
 
-import { CreateRecordRoleController } from "./CreateRcordRoleController";
+import { CreateRecordRoleController } from "./CreateRecordRoleController";
 import { CreateRecordRoleUseCase } from "./CreateRecordRoleUseCase";
 
 const prismaUserOnRolesRepository = new PrismaUserOnRolesRepository();

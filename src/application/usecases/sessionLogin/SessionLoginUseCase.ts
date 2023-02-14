@@ -26,9 +26,10 @@ export class SessionLoginUseCase {
         if (!secret_key) {
             return new Error('Error internal');
         }
-        const token = sign({}, secret_key, {
+        const token = sign({
+            userId: usertExists.id
+        }, secret_key, {
             expiresIn: '1H',
-            subject: usertExists.id
         });
 
         return token;

@@ -81,4 +81,28 @@ export class PrismaRoleRepository implements IRoleRepository {
         return rolesInMemory;
     }
 
+    async findManyByIds(rolesId: string[]): Promise<Role[] | null> {
+
+        const roles = await prisma.role.findMany({
+            where: {
+                id: {
+                    in: rolesId
+                }
+            }
+        })
+
+        const rolesInMemory: Role[] = []
+        roles.forEach(roleData => {
+            const role = Role.create({
+                name: roleData.name,
+                description: roleData.description ?? undefined,
+                created_at: roleData.created_at,
+                updated_at: roleData.updated_at
+            }, roleData.id);
+            rolesInMemory.push(role);
+        })
+
+        return rolesInMemory;
+    }
+
 }

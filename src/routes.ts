@@ -7,6 +7,7 @@ import { isAllowed } from './middlewares/isAllowed';
 import { createRecordRoleController } from './application/usecases/createRecordRole';
 import { getUserByIdController } from './application/usecases/getUserById';
 import { getAllUsersController } from './application/usecases/getAllUsers';
+import { createOrganizationController } from './application/usecases/createOrganization';
 
 const routes = Router();
 
@@ -46,3 +47,9 @@ routes.post('/roles', isAuthenticated(), (req: Request, res: Response) => {
 });
 
 export { routes };
+
+//routes Organization
+
+routes.post('/organizations', isAuthenticated(), (req: Request, res: Response) => {
+    return createOrganizationController.handle(req, res);
+});

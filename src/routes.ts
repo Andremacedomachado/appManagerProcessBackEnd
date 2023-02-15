@@ -8,6 +8,7 @@ import { createRecordRoleController } from './application/usecases/createRecordR
 import { getUserByIdController } from './application/usecases/getUserById';
 import { getAllUsersController } from './application/usecases/getAllUsers';
 import { createOrganizationController } from './application/usecases/createOrganization';
+import { getOrganizationByIdController } from './application/usecases/getOrganizationById';
 
 const routes = Router();
 
@@ -52,4 +53,8 @@ export { routes };
 
 routes.post('/organizations', isAuthenticated(), (req: Request, res: Response) => {
     return createOrganizationController.handle(req, res);
+});
+
+routes.get('/organizations', isAuthenticated(), (req: Request, res: Response) => {
+    return getOrganizationByIdController.handle(req, res);
 });

@@ -9,6 +9,7 @@ import { getUserByIdController } from './application/usecases/getUserById';
 import { getAllUsersController } from './application/usecases/getAllUsers';
 import { createOrganizationController } from './application/usecases/createOrganization';
 import { getOrganizationByIdController } from './application/usecases/getOrganizationById';
+import { getAllOrganizationController } from './application/usecases/getAllOrganization';
 
 const routes = Router();
 
@@ -55,6 +56,10 @@ routes.post('/organizations', isAuthenticated(), (req: Request, res: Response) =
     return createOrganizationController.handle(req, res);
 });
 
-routes.get('/organizations', isAuthenticated(), (req: Request, res: Response) => {
+routes.get('/organization', isAuthenticated(), (req: Request, res: Response) => {
     return getOrganizationByIdController.handle(req, res);
+});
+
+routes.get('/organizations', isAuthenticated(), (req: Request, res: Response) => {
+    return getAllOrganizationController.handle(req, res);
 });

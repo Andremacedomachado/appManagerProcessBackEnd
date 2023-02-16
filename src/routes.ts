@@ -10,6 +10,7 @@ import { getAllUsersController } from './application/usecases/getAllUsers';
 import { createOrganizationController } from './application/usecases/createOrganization';
 import { getOrganizationByIdController } from './application/usecases/getOrganizationById';
 import { getAllOrganizationController } from './application/usecases/getAllOrganization';
+import { createOrganizationSectorController } from './application/usecases/createOrganizationSector';
 
 const routes = Router();
 
@@ -62,4 +63,10 @@ routes.get('/organization', isAuthenticated(), (req: Request, res: Response) => 
 
 routes.get('/organizations', isAuthenticated(), (req: Request, res: Response) => {
     return getAllOrganizationController.handle(req, res);
+});
+
+//routes Sectors
+
+routes.post('/sectors', isAuthenticated(), (req: Request, res: Response) => {
+    return createOrganizationSectorController.handle(req, res);
 });

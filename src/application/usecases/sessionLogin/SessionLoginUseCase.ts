@@ -16,6 +16,9 @@ export class SessionLoginUseCase {
         if (!usertExists) {
             return new Error('User ou exist');
         }
+        if (usertExists.props.status != process.env.USER_STATUS_ACTIVE) {
+            return new Error('User not permission access application - contact administrator')
+        }
         const passwordMatch = await compare(data.password, usertExists.props.password);
         if (!passwordMatch) {
             return new Error('User or password incorrect');

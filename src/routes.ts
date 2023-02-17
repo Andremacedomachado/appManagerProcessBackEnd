@@ -13,6 +13,7 @@ import { getAllOrganizationController } from './application/usecases/getAllOrgan
 import { createOrganizationSectorController } from './application/usecases/createOrganizationSector';
 import { getAllOrganizationSectorController } from './application/usecases/getAllOrganizationSector';
 import { getOrganizationSectorByIdController } from './application/usecases/getOganizationSectorById';
+import { changeWorkerStatusController } from './application/usecases/changeWorkerStatus';
 
 const routes = Router();
 
@@ -37,6 +38,10 @@ routes.post('/users', isAuthenticated(), isAllowed(['Funcionario']), (req: Reque
 
 routes.post('/user/roles', isAuthenticated(), (req: Request, res: Response) => {
     return createRecordRoleController.handle(req, res);
+});
+
+routes.post('/user', isAuthenticated(), (req: Request, res: Response) => {
+    return changeWorkerStatusController.handle(req, res);
 });
 
 //routes login

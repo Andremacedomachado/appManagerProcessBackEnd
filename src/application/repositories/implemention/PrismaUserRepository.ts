@@ -1,5 +1,5 @@
 import { hash } from 'bcryptjs';
-import { IUserRepository, UserId } from '../IUserRepository';
+import { IUserRepository, IUserUpdateProps, UserId } from '../IUserRepository';
 
 import { prisma } from '../../../database';
 import { User } from '../../../domain/entities/User';
@@ -90,5 +90,39 @@ export class PrismaUserRepository implements IUserRepository {
             userCollection.push(userInMemory);
         });
         return userCollection;
+    }
+
+    async update(userChangeData: IUserUpdateProps): Promise<User | null> {
+
+        const userExists = await this.findById(userChangeData.id);
+        if (!userExists) {
+            return null;
+        }
+
+        const userUpdatedInDatabase = await prisma.user.update({
+            where: {
+                id: userChangeData.id
+            },
+            data: {
+                name: userChangeData.name || undefined,
+                email: userChangeData.email || undefined,
+                password: userChangeData.password || undefined,
+                updated_at: new Date,
+                organization_sector_id: userChangeData.organization_sector_id || undefined,
+                status: userChangeData.status || undefined
+            }
+        })
+        const { name, email, created_at, updated_at, password, status, organization_sector_id, id } = userUpdatedInDatabase
+        const userUpdatedInMemory = User.create({
+            name,
+            email,
+            created_at,
+            updated_at,
+            password,
+            status,
+            organization_sector_id
+        }, id);
+
+        return userUpdatedInMemory
     }
 }

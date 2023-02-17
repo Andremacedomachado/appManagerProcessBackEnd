@@ -2,6 +2,7 @@ import { IRoleRepository } from "../IRoleRepository";
 import { IUserRepository } from "../IUserRepository";
 import { IUserOnRolesRepository } from "../IUserOnRolesRepository";
 import { IUserFullInfo, IUserIntegrationRepository, organizationInfo, roleInfo } from "../IUserIntegrationRepository";
+import { IOrganizationSectorRepository } from "../IOrganizationSectorRepository";
 
 
 
@@ -10,6 +11,7 @@ export class PrismaUserIntegrationRepository implements IUserIntegrationReposito
         private userRepository: IUserRepository,
         private roleRepository: IRoleRepository,
         private userOnRoleRepository: IUserOnRolesRepository,
+        private organizationSectorRepository: IOrganizationSectorRepository
     ) {
     }
     async saveChange(): Promise<void> {
@@ -24,6 +26,7 @@ export class PrismaUserIntegrationRepository implements IUserIntegrationReposito
             return new Error("User not exist");
         }
         const recordRoles = await this.userOnRoleRepository.findByUserId(useInfoInitial.id);
+        const serctorAllocated = await this.organizationSectorRepository.findById(useInfoInitial.props.organization_sector_id);
         if (recordRoles) {
             const seacherIds = recordRoles.map(record => record.role_id)
             const roleInfo = await this.roleRepository.findManyByIds(seacherIds);
@@ -38,9 +41,9 @@ export class PrismaUserIntegrationRepository implements IUserIntegrationReposito
 
 
             const organizationInsert = {
-                organizationId: useInfoInitial.props.organization_sector_id,
-                dateLinkSector: new Date,
-                organizationName: useInfoInitial.props.name,
+                organizationId: serctorAllocated?.id,
+                dateLinkSector: serctorAllocated?.props.created_at,
+                organizationName: serctorAllocated?.props.name,
             } as organizationInfo;
 
             const userInfo: IUserFullInfo = {
@@ -57,9 +60,9 @@ export class PrismaUserIntegrationRepository implements IUserIntegrationReposito
             return userInfo;
         } else {
             const organizationInsert = {
-                organizationId: useInfoInitial.props.organization_sector_id,
-                dateLinkSector: new Date,
-                organizationName: useInfoInitial.props.name,
+                organizationId: serctorAllocated?.id,
+                dateLinkSector: serctorAllocated?.props.created_at,
+                organizationName: serctorAllocated?.props.name,
             } as organizationInfo;
 
             const userInfo: IUserFullInfo = {

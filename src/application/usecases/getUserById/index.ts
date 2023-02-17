@@ -5,12 +5,15 @@ import { PrismaUserIntegrationRepository } from "../../repositories/implemention
 
 import { GetUserByIdController } from "./GetUserByIdController";
 import { GetUserByIdUseCase } from "./GetUserByIdUseCase";
+import { PrismaOrganizationSectorRepository } from "../../repositories/implemention/PrismaOrganizationSectorRepository";
 
 const prismaUserRepository = new PrismaUserRepository();
 const prismaRoleRepository = new PrismaRoleRepository();
 const prismaUserOnRoleRepository = new PrismaUserOnRolesRepository()
+const prismaOrganizationSectorRepository = new PrismaOrganizationSectorRepository();
+
 const prismaUserIntegrationRepository = new PrismaUserIntegrationRepository(
-    prismaUserRepository, prismaRoleRepository, prismaUserOnRoleRepository
+    prismaUserRepository, prismaRoleRepository, prismaUserOnRoleRepository, prismaOrganizationSectorRepository
 )
 
 const getUserByIdUseCase = new GetUserByIdUseCase(prismaUserIntegrationRepository);

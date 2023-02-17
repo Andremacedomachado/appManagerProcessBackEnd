@@ -11,7 +11,7 @@ export class GetUserByIdUseCase {
 
     async excute(userId: string) {
         const user = await this.userIntegrationRepository.getFullInfoUser(userId)
-        console.log(user);
+
         return user;
     }
 }

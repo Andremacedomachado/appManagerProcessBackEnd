@@ -14,6 +14,7 @@ import { createOrganizationSectorController } from './application/usecases/creat
 import { getAllOrganizationSectorController } from './application/usecases/getAllOrganizationSector';
 import { getOrganizationSectorByIdController } from './application/usecases/getOganizationSectorById';
 import { changeWorkerStatusController } from './application/usecases/changeWorkerStatus';
+import { createActivityController } from './application/usecases/createActivity';
 
 const routes = Router();
 
@@ -84,4 +85,10 @@ routes.get('/sectors', isAuthenticated(), (req: Request, res: Response) => {
 
 routes.get('/sector', isAuthenticated(), (req: Request, res: Response) => {
     return getOrganizationSectorByIdController.handle(req, res);
+});
+
+//routes Activities
+
+routes.post('/activities', isAuthenticated(), (req: Request, res: Response) => {
+    return createActivityController.handle(req, res);
 });

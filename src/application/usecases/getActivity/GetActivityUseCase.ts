@@ -4,7 +4,7 @@ import { IGetActivityRequestDTO } from "./GetActivityDTO";
 export class GetActivityUseCase {
     constructor(private activityRepository: IActivityRepository) { }
 
-    async excute(dataSearch: IGetActivityRequestDTO) {
+    async execute(dataSearch: IGetActivityRequestDTO) {
         const activityOrNull = await this.activityRepository.findByTitle(dataSearch.title);
 
         if (!activityOrNull) {

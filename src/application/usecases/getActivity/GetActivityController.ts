@@ -8,7 +8,7 @@ export class GetActivityController {
     async handle(request: Request, response: Response) {
         const { title } = request.body
         try {
-            const activityOrError = await this.getActivityUseCase.excute({ title } as IGetActivityRequestDTO);
+            const activityOrError = await this.getActivityUseCase.execute({ title } as IGetActivityRequestDTO);
 
             if (activityOrError instanceof Error) {
                 return response.status(400).json({ error: activityOrError.message });

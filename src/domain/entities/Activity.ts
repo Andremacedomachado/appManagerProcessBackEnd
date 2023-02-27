@@ -7,6 +7,7 @@ export interface IActivityProps {
     updated_at?: Date,
     progress_status?: string,
     due_date?: Date,
+    start_date?: Date,
     responsible_id: string,
     parent_activity_id?: string,
     dependency_link_date?: Date
@@ -22,6 +23,7 @@ export class Activity extends Entity<IActivityProps>{
         return new Activity({
             ...props,
             created_at: props.created_at ?? new Date(),
+            start_date: props.start_date ?? new Date(),
             updated_at: props.updated_at ?? new Date()
         }, id)
     }

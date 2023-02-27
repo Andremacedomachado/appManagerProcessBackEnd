@@ -5,7 +5,7 @@ import { IActivityId, IActivityRepository, IActivityUniqueContentProps, IActivit
 
 export class PrismaActivityRepository implements IActivityRepository {
     async save(activity: Activity): Promise<IActivityId | null> {
-        const { title, description, created_at, updated_at, due_date, dependency_link_date, parent_activity_id, progress_status, responsible_id }: IActivityProps = activity.props;
+        const { title, description, created_at, updated_at, due_date, start_date, dependency_link_date, parent_activity_id, progress_status, responsible_id }: IActivityProps = activity.props;
 
         const activityInDatabase = await prisma.activity.create({
             data: {
@@ -14,6 +14,7 @@ export class PrismaActivityRepository implements IActivityRepository {
                 created_at,
                 updated_at,
                 due_date,
+                start_date,
                 dependency_link_date,
                 parent_activity_id,
                 responsible_id,
@@ -33,7 +34,7 @@ export class PrismaActivityRepository implements IActivityRepository {
         if (!activityExists) {
             return null;
         }
-        const { title, description, created_at, updated_at, responsible_id, due_date, dependency_link_date, parent_activity_id, progress_status } = activityExists
+        const { title, description, created_at, updated_at, responsible_id, start_date, due_date, dependency_link_date, parent_activity_id, progress_status } = activityExists
         const activityInMemory = Activity.create({
             title,
             description: !description ? undefined : description,
@@ -41,6 +42,7 @@ export class PrismaActivityRepository implements IActivityRepository {
             updated_at,
             responsible_id,
             dependency_link_date: !dependency_link_date ? undefined : dependency_link_date,
+            start_date: !start_date ? undefined : start_date,
             due_date: !due_date ? undefined : due_date,
             parent_activity_id: !parent_activity_id ? undefined : parent_activity_id,
             progress_status
@@ -56,7 +58,7 @@ export class PrismaActivityRepository implements IActivityRepository {
         }
         const activitiesInMemory: Activity[] = [];
         activitiesAllExists.forEach(activityInDatabase => {
-            const { id, title, description, created_at, updated_at, responsible_id, due_date, dependency_link_date, parent_activity_id, progress_status } = activityInDatabase
+            const { id, title, description, created_at, updated_at, responsible_id, start_date, due_date, dependency_link_date, parent_activity_id, progress_status } = activityInDatabase
             const activityInMemory = Activity.create({
                 title,
                 description: !description ? undefined : description,
@@ -65,6 +67,7 @@ export class PrismaActivityRepository implements IActivityRepository {
                 responsible_id,
                 dependency_link_date: !dependency_link_date ? undefined : dependency_link_date,
                 due_date: !due_date ? undefined : due_date,
+                start_date: !start_date ? undefined : start_date,
                 parent_activity_id: !parent_activity_id ? undefined : parent_activity_id,
                 progress_status
             }, id)
@@ -85,13 +88,14 @@ export class PrismaActivityRepository implements IActivityRepository {
             return null;
         }
 
-        const { id, title, description, created_at, updated_at, due_date, parent_activity_id, dependency_link_date, progress_status, responsible_id } = activityInDatabase
+        const { id, title, description, created_at, updated_at, start_date, due_date, parent_activity_id, dependency_link_date, progress_status, responsible_id } = activityInDatabase
         const activityInMemory = Activity.create({
             title: title,
             description: description || undefined,
             created_at: created_at || undefined,
             updated_at: updated_at || undefined,
             due_date: due_date || undefined,
+            start_date: !start_date ? undefined : start_date,
             responsible_id: responsible_id,
             parent_activity_id: parent_activity_id || undefined,
             dependency_link_date: dependency_link_date || undefined,
@@ -117,7 +121,7 @@ export class PrismaActivityRepository implements IActivityRepository {
             return null;
         }
 
-        const { id, title, description, created_at, updated_at, due_date, parent_activity_id, dependency_link_date, progress_status, responsible_id } = activityInDatabase
+        const { id, title, description, created_at, updated_at, due_date, start_date, parent_activity_id, dependency_link_date, progress_status, responsible_id } = activityInDatabase
         const activityInMemory = Activity.create({
             title,
             description: !description ? undefined : description,
@@ -126,6 +130,7 @@ export class PrismaActivityRepository implements IActivityRepository {
             responsible_id,
             dependency_link_date: !dependency_link_date ? undefined : dependency_link_date,
             due_date: !due_date ? undefined : due_date,
+            start_date: !start_date ? undefined : start_date,
             parent_activity_id: !parent_activity_id ? undefined : parent_activity_id,
             progress_status
         }, id);
@@ -148,13 +153,14 @@ export class PrismaActivityRepository implements IActivityRepository {
                 created_at: activityChangeData.created_at || undefined,
                 updated_at: activityChangeData.updated_at || undefined,
                 due_date: activityChangeData.due_date || undefined,
+                start_date: activityChangeData.start_date || undefined,
                 responsible_id: activityChangeData.responsible_id || undefined,
                 parent_activity_id: activityChangeData.parent_activity_id || undefined,
                 dependency_link_date: activityChangeData.dependency_link_date || undefined,
                 progress_status: activityChangeData.progress_status as ProgressStatusActivity || undefined,
             }
         })
-        const { id, title, description, created_at, updated_at, responsible_id, due_date, dependency_link_date, parent_activity_id, progress_status } = activityUpdatedInDatabase
+        const { id, title, description, created_at, updated_at, responsible_id, due_date, start_date, dependency_link_date, parent_activity_id, progress_status } = activityUpdatedInDatabase
         const activityUpdatedInMemory = Activity.create({
             title,
             description: !description ? undefined : description,
@@ -163,6 +169,7 @@ export class PrismaActivityRepository implements IActivityRepository {
             responsible_id,
             dependency_link_date: !dependency_link_date ? undefined : dependency_link_date,
             due_date: !due_date ? undefined : due_date,
+            start_date: !start_date ? undefined : start_date,
             parent_activity_id: !parent_activity_id ? undefined : parent_activity_id,
             progress_status
         }, id);

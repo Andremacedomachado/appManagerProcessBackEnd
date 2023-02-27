@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "Activity" ADD COLUMN     "start_date" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP;

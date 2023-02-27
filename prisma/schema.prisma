@@ -101,6 +101,7 @@ model Activity {
 
     created_at DateTime  @default(now())
     updated_at DateTime  @updatedAt
+    start_date DateTime  @default(now())
     due_date   DateTime?
 
     Responsible    User   @relation(fields: [responsible_id], references: [id])

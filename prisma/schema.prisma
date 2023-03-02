@@ -77,6 +77,8 @@ model Organization {
     created_at         DateTime             @default(now())
     updated_at         DateTime             @updatedAt
     OrganizationSector OrganizationSector[]
+
+    @@map("organization")
 }
 
 model OrganizationSector {
@@ -91,6 +93,8 @@ model OrganizationSector {
     organization_id String
 
     User User[]
+
+    @@map("organization_sector")
 }
 
 model Activity {
@@ -116,6 +120,8 @@ model Activity {
     Collaborators        Collaborators[]
     Annex                Annex[]
     MessageAtivity       MessageAtivity[]
+
+    @@map("activity")
 }
 
 enum ProgressStatusActivity {
@@ -130,6 +136,7 @@ model Collaborators {
     activity_id String
 
     @@id([user_id, activity_id])
+    @@map("collaborators")
 }
 
 model Annex {
@@ -144,6 +151,7 @@ model Annex {
     user_id             String
 
     @@id([activity_id, user_id])
+    @@map("annex")
 }
 
 model MessageAtivity {
@@ -157,6 +165,7 @@ model MessageAtivity {
     user_id             String
 
     @@id([activity_id, user_id])
+    @@map("message_activity")
 }
 
 enum TypeMessage {

@@ -17,6 +17,7 @@ import { changeWorkerStatusController } from './application/usecases/changeWorke
 import { createActivityController } from './application/usecases/createActivity';
 import { getActivityController } from './application/usecases/getActivity';
 import { getAllActivityController } from './application/usecases/getAllActivity';
+import { getDescendantActivityTreeController } from './application/usecases/getDescendantActivitytree';
 
 const routes = Router();
 
@@ -27,7 +28,7 @@ routes.get('/', (req: Request, res: Response) => {
 })
 
 //rotes user
-routes.get('/users', isAuthenticated(), isAllowed(['Funcionario']), (req: Request, res: Response) => {
+routes.get('/users', isAuthenticated(), (req: Request, res: Response) => {
     return getAllUsersController.handle(req, res);
 });
 
@@ -101,4 +102,8 @@ routes.get('/activities', isAuthenticated(), (req: Request, res: Response) => {
 
 routes.get('/activity', isAuthenticated(), (req: Request, res: Response) => {
     return getActivityController.handle(req, res);
+})
+
+routes.get('/activityTree', isAuthenticated(), (req: Request, res: Response) => {
+    return getDescendantActivityTreeController.handle(req, res);
 })

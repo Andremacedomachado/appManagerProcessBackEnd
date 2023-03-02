@@ -137,6 +137,24 @@ export class PrismaActivityRepository implements IActivityRepository {
 
         return activityInMemory;
     }
+
+    async findTreeDescendant(activityId: string): Promise<Object[] | null> {
+
+        const activityRoot = await this.findById(activityId);
+        if (!activityRoot) {
+            return null;
+        }
+
+        const activityTree = await prisma.$queryRaw`WITH RECURSIVE parents(id, parent_activity_id, title) AS (
+            SELECT id, parent_activity_id, title,description FROM activity
+                WHERE id = ${activityId}
+          UNION ALL
+            SELECT a.id, a.parent_activity_id, a.title, a.description FROM activity as a
+                INNER JOIN parents ON a.parent_activity_id = parents.id
+        )
+        SELECT * FROM parents`;
+        return activityTree as Object[];
+    }
     async update(activityChangeData: IActivityUpdateProps): Promise<Activity | null> {
         const activityInDatabase = await this.findById(activityChangeData.id);
         if (!activityInDatabase) {

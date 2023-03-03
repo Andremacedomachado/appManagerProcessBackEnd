@@ -20,6 +20,7 @@ import { getAllActivityController } from './application/usecases/getAllActivity'
 import { getDescendantActivityTreeController } from './application/usecases/getDescendantActivitytree';
 import { createCollaboratorController } from './application/usecases/createCollaborator';
 import { getCollaboratorByActivityIdController } from './application/usecases/getCollaboratorByActivity';
+import { getCollaboratorByUserController } from './application/usecases/getCollaboratorByUser';
 
 const routes = Router();
 
@@ -119,3 +120,7 @@ routes.post('/collaborators', isAuthenticated(), (req: Request, res: Response) =
 routes.get('/collaboratorsByActivity', isAuthenticated(), (req: Request, res: Response) => {
     return getCollaboratorByActivityIdController.handle(req, res);
 });
+
+routes.get('/collaboratorsByUser', isAuthenticated(), (req: Request, res: Response) => {
+    return getCollaboratorByUserController.handle(req, res);
+})

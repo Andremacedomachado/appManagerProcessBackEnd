@@ -18,5 +18,6 @@ export interface IActivityRepository {
     findByTitle(titleSearch: string): Promise<Activity | null>,
     findUniqueForcontent(dataSearch: IActivityUniqueContentProps): Promise<Activity | null>,
     findTreeDescendant(activityId: string): Promise<Object[] | null>,
+    findRootNodeById(activityId: string): Promise<Activity | null>
     update(activity: IActivityProps): Promise<Activity | null>,
 }

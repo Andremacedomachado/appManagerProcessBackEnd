@@ -22,6 +22,7 @@ import { createCollaboratorController } from './application/usecases/createColla
 import { getCollaboratorByActivityIdController } from './application/usecases/getCollaboratorByActivity';
 import { getCollaboratorByUserController } from './application/usecases/getCollaboratorByUser';
 import { getRootNodeActivityTreeController } from './application/usecases/getRootNodeActivityTree';
+import { getALLActivityTreeByUserController } from './application/usecases/getAllActivityTreeByUser';
 
 const routes = Router();
 
@@ -114,6 +115,10 @@ routes.get('/activityTree', isAuthenticated(), (req: Request, res: Response) => 
 
 routes.get('/activityRootNode', isAuthenticated(), (req: Request, res: Response) => {
     return getRootNodeActivityTreeController.handle(req, res);
+})
+
+routes.get('/collectionActivityTree', isAuthenticated(), (req: Request, res: Response) => {
+    return getALLActivityTreeByUserController.handle(req, res);
 })
 
 //routes Collaborators

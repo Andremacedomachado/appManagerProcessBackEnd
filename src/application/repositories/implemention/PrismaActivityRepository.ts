@@ -138,22 +138,38 @@ export class PrismaActivityRepository implements IActivityRepository {
         return activityInMemory;
     }
 
-    async findTreeDescendant(activityId: string): Promise<Object[] | null> {
+    async findTreeDescendant(activityId: string): Promise<Activity[] | null> {
 
         const activityRoot = await this.findById(activityId);
         if (!activityRoot) {
             return null;
         }
 
-        const activityTree = await prisma.$queryRaw`WITH RECURSIVE parents(id, parent_activity_id, title) AS (
-            SELECT id, parent_activity_id, title,description FROM activity
+        const activityTree = await prisma.$queryRaw<ActivitiPrisma[]>`WITH RECURSIVE parents(id, parent_activity_id, title) AS (
+            SELECT id, parent_activity_id, title, description, created_at, updated_at, responsible_id, due_date, start_date, dependency_link_date, progress_status FROM activity
                 WHERE id = ${activityId}
           UNION ALL
-            SELECT a.id, a.parent_activity_id, a.title, a.description FROM activity as a
+            SELECT a.id, a.parent_activity_id, a.title, a.description, a.created_at, a.updated_at, a.responsible_id, a.due_date, a.start_date, a.dependency_link_date, a.progress_status FROM activity as a
                 INNER JOIN parents ON a.parent_activity_id = parents.id
         )
         SELECT * FROM parents`;
-        return activityTree as Object[];
+
+        const activityTreeInMemory = activityTree.map(activity => {
+            const { id, title, description, created_at, updated_at, responsible_id, due_date, start_date, dependency_link_date, parent_activity_id, progress_status } = activity;
+            return Activity.create({
+                title,
+                description: !description ? undefined : description,
+                created_at,
+                updated_at,
+                responsible_id,
+                dependency_link_date: !dependency_link_date ? undefined : dependency_link_date,
+                due_date: !due_date ? undefined : due_date,
+                start_date: !start_date ? undefined : start_date,
+                parent_activity_id: !parent_activity_id ? undefined : parent_activity_id,
+                progress_status
+            }, id);
+        })
+        return activityTreeInMemory;
     }
     async update(activityChangeData: IActivityUpdateProps): Promise<Activity | null> {
         const activityInDatabase = await this.findById(activityChangeData.id);
@@ -210,8 +226,6 @@ export class PrismaActivityRepository implements IActivityRepository {
         )
         SELECT * FROM parents
             WHERE parents.parent_activity_id IS NULL`;
-
-        console.log(activityInDatabase);
 
         const { id, title, description, created_at, updated_at, responsible_id, due_date, start_date, dependency_link_date, parent_activity_id, progress_status } = activityInDatabase[0];
         const activityInMemory = Activity.create({

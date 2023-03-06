@@ -243,4 +243,35 @@ export class PrismaActivityRepository implements IActivityRepository {
 
         return activityInMemory
     }
+
+    async changeProcessStatusCascate(activityId: string): Promise<Error | null> {
+        const activityTree = await this.findTreeDescendant(activityId);
+        if (!activityTree) {
+            return new Error('Activity dont exists!');
+        }
+
+        const collectionActivityIdToChange = activityTree.map(activity => activity.id);
+
+        const resultTransaction = await prisma.activity.updateMany({
+            where: {
+                id: {
+                    in: collectionActivityIdToChange
+                },
+                progress_status: {
+                    equals: ProgressStatusActivity.DO_TO
+                }
+            },
+            data: {
+                progress_status: ProgressStatusActivity.CLOSED,
+                updated_at: new Date()
+            }
+        });
+
+        console.log(resultTransaction.count);
+        if (resultTransaction.count == 0) {
+            return new Error('Error transaction operation failed Or all records closed.')
+        }
+
+        return null;
+    }
 }

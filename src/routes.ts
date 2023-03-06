@@ -23,6 +23,7 @@ import { getCollaboratorByActivityIdController } from './application/usecases/ge
 import { getCollaboratorByUserController } from './application/usecases/getCollaboratorByUser';
 import { getRootNodeActivityTreeController } from './application/usecases/getRootNodeActivityTree';
 import { getALLActivityTreeByUserController } from './application/usecases/getAllActivityTreeByUser';
+import { changeActivityTreeProcessStatusController } from './application/usecases/changeActivityTreeProcessStatus';
 
 const routes = Router();
 
@@ -119,6 +120,10 @@ routes.get('/activityRootNode', isAuthenticated(), (req: Request, res: Response)
 
 routes.get('/collectionActivityTree', isAuthenticated(), (req: Request, res: Response) => {
     return getALLActivityTreeByUserController.handle(req, res);
+})
+
+routes.post('/changeActivityTreeProcessStatus', isAuthenticated(), (req: Request, res: Response) => {
+    return changeActivityTreeProcessStatusController.handle(req, res);
 })
 
 //routes Collaborators

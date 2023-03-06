@@ -20,4 +20,5 @@ export interface IActivityRepository {
     findTreeDescendant(activityId: string): Promise<Activity[] | null>,
     findRootNodeById(activityId: string): Promise<Activity | null>
     update(activity: IActivityProps): Promise<Activity | null>,
+    changeProcessStatusCascate(activityId: string): Promise<Error | null>
 }

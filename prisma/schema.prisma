@@ -157,6 +157,7 @@ model Annex {
 model MessageAtivity {
     content          String
     publication_date DateTime    @default(now())
+    updated_at       DateTime    @default(now())
     type_message     TypeMessage
 
     CorrelationActivity Activity @relation(fields: [activity_id], references: [id])
@@ -164,7 +165,7 @@ model MessageAtivity {
     Publisher           User     @relation(fields: [user_id], references: [id])
     user_id             String
 
-    @@id([activity_id, user_id])
+    @@id([activity_id, user_id, publication_date])
     @@map("message_activity")
 }
 

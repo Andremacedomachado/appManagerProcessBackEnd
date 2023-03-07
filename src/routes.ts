@@ -24,6 +24,7 @@ import { getCollaboratorByUserController } from './application/usecases/getColla
 import { getRootNodeActivityTreeController } from './application/usecases/getRootNodeActivityTree';
 import { getALLActivityTreeByUserController } from './application/usecases/getAllActivityTreeByUser';
 import { changeActivityTreeProcessStatusController } from './application/usecases/changeActivityTreeProcessStatus';
+import { createMessageActivityController } from './application/usecases/createMessageActivity';
 
 const routes = Router();
 
@@ -139,3 +140,9 @@ routes.get('/collaboratorsByActivity', isAuthenticated(), (req: Request, res: Re
 routes.get('/collaboratorsByUser', isAuthenticated(), (req: Request, res: Response) => {
     return getCollaboratorByUserController.handle(req, res);
 })
+
+//routes Message Activity
+
+routes.post('/messageActivity', isAuthenticated(), (req: Request, res: Response) => {
+    return createMessageActivityController.handle(req, res);
+});

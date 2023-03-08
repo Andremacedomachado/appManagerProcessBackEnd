@@ -28,6 +28,7 @@ import { createMessageActivityController } from './application/usecases/createMe
 import { getMessageByActivityIdController } from './application/usecases/getMessageByActivityId/Index';
 import { getAllMessageActivityController } from './application/usecases/getAllMessageActivity/Index';
 import { getMessageByUserIdController } from './application/usecases/getMessageByUserId/Index';
+import { updateMessageActivityController } from './application/usecases/updateMessageActivity';
 
 const routes = Router();
 
@@ -160,4 +161,8 @@ routes.get('/messageActivity', isAuthenticated(), (req: Request, res: Response) 
 
 routes.get('/messageActivity/userId', isAuthenticated(), (req: Request, res: Response) => {
     return getMessageByUserIdController.handle(req, res);
+});
+
+routes.put('/messageActivity', isAuthenticated(), (req: Request, res: Response) => {
+    return updateMessageActivityController.handle(req, res);
 });

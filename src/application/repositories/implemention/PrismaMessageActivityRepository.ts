@@ -179,7 +179,7 @@ export class PrismaMessageActivityRepository implements IMessagaActivityReposito
             data: {
                 content,
                 publication_date,
-                updated_at,
+                updated_at: updated_at ?? new Date(),
                 type_message: type_message ? type_message as unknown as TypeMessage : undefined
             }
         });

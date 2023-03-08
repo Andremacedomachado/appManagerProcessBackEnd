@@ -106,6 +106,16 @@ export class PrismaMessageActivityRepository implements IMessagaActivityReposito
         return collectionMessageActivityInMemory;
     }
     async findByAtivityId(activityId: string): Promise<MessageActivity[] | null> {
+        const activityExists = await prisma.activity.findUnique({
+            where: {
+                id: activityId
+            }
+        });
+
+        if (!activityExists) {
+            return null
+        }
+
         const recordsMessage = await prisma.messageAtivity.findMany({
             where: {
                 activity_id: activityId
@@ -127,6 +137,16 @@ export class PrismaMessageActivityRepository implements IMessagaActivityReposito
     }
 
     async findByUserId(userId: string): Promise<MessageActivity[] | null> {
+        const userExists = await prisma.user.findUnique({
+            where: {
+                id: userId
+            }
+        });
+
+        if (!userExists) {
+            return null
+        }
+
         const recordsMessage = await prisma.messageAtivity.findMany({
             where: {
                 user_id: userId

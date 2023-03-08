@@ -27,6 +27,7 @@ import { changeActivityTreeProcessStatusController } from './application/usecase
 import { createMessageActivityController } from './application/usecases/createMessageActivity';
 import { getMessageByActivityIdController } from './application/usecases/getMessageByActivityId/Index';
 import { getAllMessageActivityController } from './application/usecases/getAllMessageActivity/Index';
+import { getMessageByUserIdController } from './application/usecases/getMessageByUserId/Index';
 
 const routes = Router();
 
@@ -155,4 +156,8 @@ routes.get('/messageActivity/activityId', isAuthenticated(), (req: Request, res:
 
 routes.get('/messageActivity', isAuthenticated(), (req: Request, res: Response) => {
     return getAllMessageActivityController.handle(req, res);
+});
+
+routes.get('/messageActivity/userId', isAuthenticated(), (req: Request, res: Response) => {
+    return getMessageByUserIdController.handle(req, res);
 });

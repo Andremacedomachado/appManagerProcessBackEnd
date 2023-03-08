@@ -1,4 +1,7 @@
 import { Request, Response, Router } from 'express';
+import multer from 'multer';
+import multerConfig from './config/multer';
+
 import { createUserController } from './application/usecases/createUser';
 import { sessionLoginController } from './application/usecases/sessionLogin';
 import { createRoleController } from './application/usecases/createRole';
@@ -31,6 +34,8 @@ import { getMessageByUserIdController } from './application/usecases/getMessageB
 import { updateMessageActivityController } from './application/usecases/updateMessageActivity';
 
 const routes = Router();
+
+const upload = multer(multerConfig);
 
 routes.get('/', (req: Request, res: Response) => {
     res.json({
@@ -166,3 +171,9 @@ routes.get('/messageActivity/userId', isAuthenticated(), (req: Request, res: Res
 routes.put('/messageActivity', isAuthenticated(), (req: Request, res: Response) => {
     return updateMessageActivityController.handle(req, res);
 });
+
+//routes Annex Activity
+
+routes.post('/uploads', isAuthenticated(), upload.single('fileName'), (req: Request, res: Response) => {
+    return res.status(200).json(req.file)
+})

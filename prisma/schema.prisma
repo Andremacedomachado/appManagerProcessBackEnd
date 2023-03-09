@@ -150,7 +150,7 @@ model Annex {
     Publisher           User     @relation(fields: [user_id], references: [id])
     user_id             String
 
-    @@id([activity_id, user_id])
+    @@id([activity_id, user_id, publication_date])
     @@map("annex")
 }
 

@@ -33,6 +33,7 @@ import { getAllMessageActivityController } from './application/usecases/getAllMe
 import { getMessageByUserIdController } from './application/usecases/getMessageByUserId/Index';
 import { updateMessageActivityController } from './application/usecases/updateMessageActivity';
 import { createAnnexActivityController } from './application/usecases/createAnnexActivity';
+import { getAnnexActivityInfoUController } from './application/usecases/getAnnexActivityInfo';
 
 const routes = Router();
 
@@ -177,4 +178,8 @@ routes.put('/messageActivity', isAuthenticated(), (req: Request, res: Response) 
 
 routes.post('/uploads', isAuthenticated(), upload.single('file'), (req: Request, res: Response) => {
     return createAnnexActivityController.handle(req, res)
+})
+
+routes.get('/annexActivity', isAuthenticated(), (req: Request, res: Response) => {
+    return getAnnexActivityInfoUController.handle(req, res)
 })

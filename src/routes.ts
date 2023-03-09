@@ -35,6 +35,7 @@ import { updateMessageActivityController } from './application/usecases/updateMe
 import { createAnnexActivityController } from './application/usecases/createAnnexActivity';
 import { getAnnexActivityInfoUController } from './application/usecases/getAnnexActivityInfo';
 import { getAnnexFilecontroller } from './application/usecases/getAnnexFile';
+import { deleteAnnexActivityController } from './application/usecases/deleteAnnexActivity';
 
 const routes = Router();
 
@@ -187,4 +188,8 @@ routes.get('/annexActivity', isAuthenticated(), (req: Request, res: Response) =>
 
 routes.get('/annexActivity/file', isAuthenticated(), (req: Request, res: Response) => {
     return getAnnexFilecontroller.handle(req, res)
+})
+
+routes.delete('/annexActivity', isAuthenticated(), (req: Request, res: Response) => {
+    return deleteAnnexActivityController.handle(req, res)
 })

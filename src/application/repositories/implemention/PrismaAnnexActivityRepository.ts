@@ -161,11 +161,21 @@ export class PrismaAnnexActivityRepository implements IAnnexActivityRepository {
         return collectionAnnexActivityInMemory
     }
 
-    async delete(dataSearchAnnex: IAnnexActivityIdProps): Promise<void | null> {
-        await prisma.annex.delete({
+    async delete(dataSearchAnnex: IAnnexActivityIdProps): Promise<AnnexActivity> {
+        const annexDeleted = await prisma.annex.delete({
             where: {
                 activity_id_user_id_publication_date: dataSearchAnnex
             }
-        })
+        });
+
+        const { original_name, activity_id, file_name, publication_date, url, user_id } = annexDeleted;
+        return AnnexActivity.create({
+            original_name,
+            file_name,
+            url,
+            publication_date,
+            activity_id,
+            user_id
+        });
     }
 }

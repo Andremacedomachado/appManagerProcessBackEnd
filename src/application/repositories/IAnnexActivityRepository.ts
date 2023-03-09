@@ -17,5 +17,5 @@ export interface IAnnexActivityRepository {
     findOne(dataSearchAnnex: IAnnexActivityUnique): Promise<AnnexActivity | null>
     findManyByActivityId(activityId: string): Promise<AnnexActivity[] | null>,
     findManyByUserId(userId: string): Promise<AnnexActivity[] | null>,
-    delete(dataSearchAnnex: IAnnexActivityIdProps): Promise<void | null>,
+    delete(dataSearchAnnex: IAnnexActivityIdProps): Promise<AnnexActivity>,
 }

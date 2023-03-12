@@ -112,21 +112,35 @@ model Activity {
     responsible_id String
 
     progress_status ProgressStatusActivity @default(DO_TO)
+    type_node       NodeTypeActivity?
 
-    ParentActivity       Activity?        @relation("FK_dependenceActivity", fields: [parent_activity_id], references: [id])
-    ActivityDependencies Activity[]       @relation("FK_dependenceActivity")
-    parent_activity_id   String?
-    dependency_link_date DateTime?        @default(now())
     Collaborators        Collaborators[]
     Annex                Annex[]
     MessageAtivity       MessageAtivity[]
+    ParentRelationship   ActivityRelationship[] @relation("FK_parent_dependece")
+    ChildrenRelationship ActivityRelationship[] @relation("Fk_children_dependece")
 
     @@map("activity")
+}
+
+model ActivityRelationship {
+    parent_id            String
+    children_id          String
+    dependency_link_date DateTime? @default(now())
+    ParentActivity       Activity  @relation(fields: [parent_id], references: [id], name: "FK_parent_dependece")
+    ChildrenActivity     Activity  @relation(fields: [children_id], references: [id], name: "Fk_children_dependece")
+
+    @@id([parent_id, children_id])
 }
 
 enum ProgressStatusActivity {
     DO_TO
     CLOSED
+}
+
+enum NodeTypeActivity {
+    INITIAL
+    FINALLY
 }
 
 model Collaborators {

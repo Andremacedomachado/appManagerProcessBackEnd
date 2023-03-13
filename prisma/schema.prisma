@@ -131,6 +131,7 @@ model ActivityRelationship {
     ChildrenActivity     Activity  @relation(fields: [children_id], references: [id], name: "Fk_children_dependece")
 
     @@id([parent_id, children_id])
+    @@map("activityRelationship")
 }
 
 enum ProgressStatusActivity {

@@ -9,8 +9,6 @@ export interface IActivityProps {
     due_date?: Date,
     start_date?: Date,
     responsible_id: string,
-    parent_activity_id?: string,
-    dependency_link_date?: Date
 }
 
 

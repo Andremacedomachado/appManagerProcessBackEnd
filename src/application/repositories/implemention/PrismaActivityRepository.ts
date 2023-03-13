@@ -1,11 +1,11 @@
-import { ProgressStatusActivity, Activity as ActivitiPrisma } from '@prisma/client';
+import { ProgressStatusActivity } from '@prisma/client';
 import { prisma } from '../../../database';
 import { IActivityProps, Activity } from '../../../domain/entities/Activity';
 import { IActivityId, IActivityRepository, IActivityUniqueContentProps, IActivityUpdateProps } from '../IActivityRepository'
 
 export class PrismaActivityRepository implements IActivityRepository {
     async save(activity: Activity): Promise<IActivityId | null> {
-        const { title, description, created_at, updated_at, due_date, start_date, dependency_link_date, parent_activity_id, progress_status, responsible_id }: IActivityProps = activity.props;
+        const { title, description, created_at, updated_at, due_date, start_date, progress_status, responsible_id }: IActivityProps = activity.props;
 
         const activityInDatabase = await prisma.activity.create({
             data: {
@@ -15,8 +15,6 @@ export class PrismaActivityRepository implements IActivityRepository {
                 updated_at,
                 due_date,
                 start_date,
-                dependency_link_date,
-                parent_activity_id,
                 responsible_id,
                 progress_status: !progress_status ? undefined : progress_status as ProgressStatusActivity,
             }
@@ -34,17 +32,15 @@ export class PrismaActivityRepository implements IActivityRepository {
         if (!activityExists) {
             return null;
         }
-        const { title, description, created_at, updated_at, responsible_id, start_date, due_date, dependency_link_date, parent_activity_id, progress_status } = activityExists
+        const { title, description, created_at, updated_at, responsible_id, start_date, due_date, progress_status } = activityExists
         const activityInMemory = Activity.create({
             title,
             description: !description ? undefined : description,
             created_at,
             updated_at,
             responsible_id,
-            dependency_link_date: !dependency_link_date ? undefined : dependency_link_date,
             start_date: !start_date ? undefined : start_date,
             due_date: !due_date ? undefined : due_date,
-            parent_activity_id: !parent_activity_id ? undefined : parent_activity_id,
             progress_status
         }, activityExists.id)
 
@@ -58,17 +54,15 @@ export class PrismaActivityRepository implements IActivityRepository {
         }
         const activitiesInMemory: Activity[] = [];
         activitiesAllExists.forEach(activityInDatabase => {
-            const { id, title, description, created_at, updated_at, responsible_id, start_date, due_date, dependency_link_date, parent_activity_id, progress_status } = activityInDatabase
+            const { id, title, description, created_at, updated_at, responsible_id, start_date, due_date, progress_status } = activityInDatabase
             const activityInMemory = Activity.create({
                 title,
                 description: !description ? undefined : description,
                 created_at,
                 updated_at,
                 responsible_id,
-                dependency_link_date: !dependency_link_date ? undefined : dependency_link_date,
                 due_date: !due_date ? undefined : due_date,
                 start_date: !start_date ? undefined : start_date,
-                parent_activity_id: !parent_activity_id ? undefined : parent_activity_id,
                 progress_status
             }, id)
             activitiesInMemory.push(activityInMemory);
@@ -88,7 +82,7 @@ export class PrismaActivityRepository implements IActivityRepository {
             return null;
         }
 
-        const { id, title, description, created_at, updated_at, start_date, due_date, parent_activity_id, dependency_link_date, progress_status, responsible_id } = activityInDatabase
+        const { id, title, description, created_at, updated_at, start_date, due_date, progress_status, responsible_id } = activityInDatabase
         const activityInMemory = Activity.create({
             title: title,
             description: description || undefined,
@@ -97,8 +91,6 @@ export class PrismaActivityRepository implements IActivityRepository {
             due_date: due_date || undefined,
             start_date: !start_date ? undefined : start_date,
             responsible_id: responsible_id,
-            parent_activity_id: parent_activity_id || undefined,
-            dependency_link_date: dependency_link_date || undefined,
             progress_status: progress_status as ProgressStatusActivity || undefined,
         }, id)
 
@@ -121,56 +113,20 @@ export class PrismaActivityRepository implements IActivityRepository {
             return null;
         }
 
-        const { id, title, description, created_at, updated_at, due_date, start_date, parent_activity_id, dependency_link_date, progress_status, responsible_id } = activityInDatabase
+        const { id, title, description, created_at, updated_at, due_date, start_date, progress_status, responsible_id } = activityInDatabase
         const activityInMemory = Activity.create({
             title,
             description: !description ? undefined : description,
             created_at,
             updated_at,
             responsible_id,
-            dependency_link_date: !dependency_link_date ? undefined : dependency_link_date,
             due_date: !due_date ? undefined : due_date,
             start_date: !start_date ? undefined : start_date,
-            parent_activity_id: !parent_activity_id ? undefined : parent_activity_id,
-            progress_status
         }, id);
 
         return activityInMemory;
     }
 
-    async findTreeDescendant(activityId: string): Promise<Activity[] | null> {
-
-        const activityRoot = await this.findById(activityId);
-        if (!activityRoot) {
-            return null;
-        }
-
-        const activityTree = await prisma.$queryRaw<ActivitiPrisma[]>`WITH RECURSIVE parents(id, parent_activity_id, title) AS (
-            SELECT id, parent_activity_id, title, description, created_at, updated_at, responsible_id, due_date, start_date, dependency_link_date, progress_status FROM activity
-                WHERE id = ${activityId}
-          UNION ALL
-            SELECT a.id, a.parent_activity_id, a.title, a.description, a.created_at, a.updated_at, a.responsible_id, a.due_date, a.start_date, a.dependency_link_date, a.progress_status FROM activity as a
-                INNER JOIN parents ON a.parent_activity_id = parents.id
-        )
-        SELECT * FROM parents`;
-
-        const activityTreeInMemory = activityTree.map(activity => {
-            const { id, title, description, created_at, updated_at, responsible_id, due_date, start_date, dependency_link_date, parent_activity_id, progress_status } = activity;
-            return Activity.create({
-                title,
-                description: !description ? undefined : description,
-                created_at,
-                updated_at,
-                responsible_id,
-                dependency_link_date: !dependency_link_date ? undefined : dependency_link_date,
-                due_date: !due_date ? undefined : due_date,
-                start_date: !start_date ? undefined : start_date,
-                parent_activity_id: !parent_activity_id ? undefined : parent_activity_id,
-                progress_status
-            }, id);
-        })
-        return activityTreeInMemory;
-    }
     async update(activityChangeData: IActivityUpdateProps): Promise<Activity | null> {
         const activityInDatabase = await this.findById(activityChangeData.id);
         if (!activityInDatabase) {
@@ -189,89 +145,23 @@ export class PrismaActivityRepository implements IActivityRepository {
                 due_date: activityChangeData.due_date || undefined,
                 start_date: activityChangeData.start_date || undefined,
                 responsible_id: activityChangeData.responsible_id || undefined,
-                parent_activity_id: activityChangeData.parent_activity_id || undefined,
-                dependency_link_date: activityChangeData.dependency_link_date || undefined,
                 progress_status: activityChangeData.progress_status as ProgressStatusActivity || undefined,
             }
         })
-        const { id, title, description, created_at, updated_at, responsible_id, due_date, start_date, dependency_link_date, parent_activity_id, progress_status } = activityUpdatedInDatabase
+        const { id, title, description, created_at, updated_at, responsible_id, due_date, start_date, progress_status } = activityUpdatedInDatabase
         const activityUpdatedInMemory = Activity.create({
             title,
             description: !description ? undefined : description,
             created_at,
             updated_at,
             responsible_id,
-            dependency_link_date: !dependency_link_date ? undefined : dependency_link_date,
             due_date: !due_date ? undefined : due_date,
             start_date: !start_date ? undefined : start_date,
-            parent_activity_id: !parent_activity_id ? undefined : parent_activity_id,
             progress_status
         }, id);
 
         return activityUpdatedInMemory;
     }
 
-    async findRootNodeById(activityId: string): Promise<Activity | null> {
-        const activityRoot = await this.findById(activityId);
-        if (!activityRoot) {
-            return null;
-        }
 
-        const activityInDatabase = await prisma.$queryRaw<ActivitiPrisma[]>`WITH RECURSIVE parents(id, parent_activity_id, title) AS (
-            SELECT id, parent_activity_id, title, description, created_at, updated_at, responsible_id, due_date, start_date, dependency_link_date, progress_status FROM activity
-                WHERE id = ${activityId}
-          UNION ALL
-            SELECT a.id, a.parent_activity_id, a.title, a.description, a.created_at, a.updated_at, a.responsible_id, a.due_date, a.start_date, a.dependency_link_date, a.progress_status FROM activity as a
-                INNER JOIN parents ON   parents.parent_activity_id = a.id
-        )
-        SELECT * FROM parents
-            WHERE parents.parent_activity_id IS NULL`;
-
-        const { id, title, description, created_at, updated_at, responsible_id, due_date, start_date, dependency_link_date, parent_activity_id, progress_status } = activityInDatabase[0];
-        const activityInMemory = Activity.create({
-            title,
-            description: !description ? undefined : description,
-            created_at,
-            updated_at,
-            responsible_id,
-            dependency_link_date: !dependency_link_date ? undefined : dependency_link_date,
-            due_date: !due_date ? undefined : due_date,
-            start_date: !start_date ? undefined : start_date,
-            parent_activity_id: !parent_activity_id ? undefined : parent_activity_id,
-            progress_status
-        }, id);
-
-        return activityInMemory
-    }
-
-    async changeProcessStatusCascate(activityId: string): Promise<Error | null> {
-        const activityTree = await this.findTreeDescendant(activityId);
-        if (!activityTree) {
-            return new Error('Activity dont exists!');
-        }
-
-        const collectionActivityIdToChange = activityTree.map(activity => activity.id);
-
-        const resultTransaction = await prisma.activity.updateMany({
-            where: {
-                id: {
-                    in: collectionActivityIdToChange
-                },
-                progress_status: {
-                    equals: ProgressStatusActivity.DO_TO
-                }
-            },
-            data: {
-                progress_status: ProgressStatusActivity.CLOSED,
-                updated_at: new Date()
-            }
-        });
-
-        console.log(resultTransaction.count);
-        if (resultTransaction.count == 0) {
-            return new Error('Error transaction operation failed Or all records closed.')
-        }
-
-        return null;
-    }
 }

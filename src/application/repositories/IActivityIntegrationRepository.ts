@@ -16,5 +16,8 @@ export interface ICollectionActivityTreeFullInfo {
 export interface IActivityIntegrationRepository {
 
     saveChange(): Promise<void>,
-    getAllActivityByUser(userId: string): Promise<ICollectionActivityTreeFullInfo | Error>
+    getAllActivityByUser(userId: string): Promise<ICollectionActivityTreeFullInfo | Error>,
+    findTreeDescendant(activityId: string): Promise<Activity[] | null>,
+    findRootNodeById(activityId: string): Promise<Activity | null>,
+    changeProcessStatusCascate(activityId: string): Promise<Error | null>
 }

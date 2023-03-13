@@ -1,5 +1,9 @@
 import { Entity } from "./core/Entity";
 
+export enum TYPENODE {
+    'INITIAL',
+    'FINALLY'
+}
 export interface IActivityProps {
     title: string,
     description?: string,
@@ -9,6 +13,7 @@ export interface IActivityProps {
     due_date?: Date,
     start_date?: Date,
     responsible_id: string,
+    type_node?: TYPENODE
 }
 
 

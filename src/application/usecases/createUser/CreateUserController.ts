@@ -1,7 +1,8 @@
 import { Request, Response } from "express";
 
 import { CreateUserUseCase } from "./CreateUserUseCase";
-import { ICreateUserRequestDTO } from "./CreateUserDTO";
+import { CreateUserInputSchema } from "./CreateUserDTO";
+import { ZodError } from "zod";
 
 
 export class CreateUserController {
@@ -9,9 +10,9 @@ export class CreateUserController {
     }
 
     async handle(request: Request, response: Response) {
-        const { name, email, password, status, created_at, updated_at, organization_sector_id }: ICreateUserRequestDTO = request.body;
 
         try {
+            const { name, email, password, status, created_at, updated_at, organization_sector_id } = CreateUserInputSchema.parse(request.body);
             const userIdOrError = await this.createUserUseCase.execute({
                 name,
                 email,
@@ -26,6 +27,9 @@ export class CreateUserController {
             }
             return response.status(200).json({ userId: userIdOrError.id });
         } catch (error) {
+            if (error instanceof ZodError) {
+                return response.status(400).json({ sucess: false, errors: error })
+            }
             return response.status(500).json({ error: 'Error Unexpected' })
         }
     }

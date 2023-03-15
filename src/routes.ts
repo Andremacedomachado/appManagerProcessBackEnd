@@ -56,7 +56,7 @@ routes.get('/user', isAuthenticated(), (req: Request, res: Response) => {
     return getUserByIdController.handle(req, res);
 });
 
-routes.post('/users', isAuthenticated(), isAllowed(['Funcionario']), (req: Request, res: Response) => {
+routes.post('/users', isAuthenticated(), (req: Request, res: Response) => {
     return createUserController.handle(req, res);
 });
 

@@ -1,6 +1,6 @@
 
 
-import { IUserFullInfo, IUserIntegrationRepository } from "../../repositories/IUserIntegrationRepository";
+import { IUserIntegrationRepository } from "../../repositories/IUserIntegrationRepository";
 
 
 export class GetUserByIdUseCase {

@@ -51,6 +51,7 @@ export class PrismaUserIntegrationRepository implements IUserIntegrationReposito
                 email: useInfoInitial.props.email,
                 name: useInfoInitial.props.name,
                 created_at: useInfoInitial.props.created_at,
+                updated_at: useInfoInitial.props.updated_at,
                 status: useInfoInitial.props.status,
 
                 organization_linked: organizationInsert,
@@ -70,6 +71,7 @@ export class PrismaUserIntegrationRepository implements IUserIntegrationReposito
                 email: useInfoInitial.props.email,
                 name: useInfoInitial.props.name,
                 created_at: useInfoInitial.props.created_at,
+                updated_at: useInfoInitial.props.updated_at,
                 status: useInfoInitial.props.status,
 
                 organization_linked: organizationInsert,

@@ -5,6 +5,7 @@ export type IUserFullInfo = {
     email: string,
     status: string,
     created_at?: Date,
+    updated_at?: Date,
     organization_linked: organizationInfo,
     roles: roleInfo[],
 

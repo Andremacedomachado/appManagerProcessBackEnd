@@ -2,13 +2,13 @@ import { hash } from 'bcryptjs';
 import { IUserRepository, IUserUpdateProps, UserId } from '../IUserRepository';
 
 import { prisma } from '../../../database';
-import { User } from '../../../domain/entities/User';
+import { User, UserIsActive } from '../../../domain/entities/User';
 
 
 export class PrismaUserRepository implements IUserRepository {
 
     async save(user: User): Promise<UserId | null> {
-        const { name, email, password, organization_sector_id } = user.props;
+        const { name, email, password, organization_sector_id, status } = user.props;
         const hashPassword = await hash(password, 8);
 
         const userCreated = await prisma.user.create({
@@ -16,7 +16,8 @@ export class PrismaUserRepository implements IUserRepository {
                 name,
                 email,
                 password: hashPassword,
-                organization_sector_id
+                organization_sector_id,
+                status
             }
         });
 
@@ -39,7 +40,7 @@ export class PrismaUserRepository implements IUserRepository {
             created_at,
             updated_at,
             password,
-            status,
+            status: <UserIsActive>status,
             organization_sector_id
         }, id);
 
@@ -63,7 +64,7 @@ export class PrismaUserRepository implements IUserRepository {
             created_at,
             updated_at,
             password,
-            status,
+            status: <UserIsActive>status,
             organization_sector_id
         }, id);
 
@@ -84,7 +85,7 @@ export class PrismaUserRepository implements IUserRepository {
                 created_at,
                 updated_at,
                 password,
-                status,
+                status: <UserIsActive>status,
                 organization_sector_id
             }, id);
             userCollection.push(userInMemory);
@@ -119,7 +120,7 @@ export class PrismaUserRepository implements IUserRepository {
             created_at,
             updated_at,
             password,
-            status,
+            status: <UserIsActive>status,
             organization_sector_id
         }, id);
 

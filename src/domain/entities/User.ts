@@ -1,10 +1,15 @@
 import { Entity } from "./core/Entity"
 
-export interface IUserProps {
+export enum UserIsActive {
+    ACTIVE = "ACTIVE",
+    INACTIVE = "INACTIVE"
+}
+
+export type IUserProps = {
     name: string,
     email: string,
     password: string,
-    status: string,
+    status: UserIsActive,
     created_at?: Date,
     updated_at?: Date,
     organization_sector_id: string,

@@ -1,15 +1,20 @@
 import { Entity } from "./core/Entity";
 
 export enum TYPENODE {
-    'INITIAL',
-    'FINALLY'
+    INITIAL = "INITIAL",
+    FINALLY = 'FINALLY'
+}
+
+export enum STATUSACTIVITY {
+    DO_TO = "DO_TO",
+    CLOSED = "CLOSED"
 }
 export interface IActivityProps {
     title: string,
     description?: string,
     created_at?: Date,
     updated_at?: Date,
-    progress_status?: string,
+    progress_status?: STATUSACTIVITY,
     due_date?: Date,
     start_date?: Date,
     responsible_id: string,

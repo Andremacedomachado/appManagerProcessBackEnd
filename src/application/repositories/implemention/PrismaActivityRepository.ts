@@ -1,6 +1,6 @@
 import { NodeTypeActivity, ProgressStatusActivity } from '@prisma/client';
 import { prisma } from '../../../database';
-import { IActivityProps, Activity, TYPENODE } from '../../../domain/entities/Activity';
+import { IActivityProps, Activity, TYPENODE, STATUSACTIVITY } from '../../../domain/entities/Activity';
 import { IActivityId, IActivityRepository, IActivityUniqueContentProps, IActivityUpdateProps } from '../IActivityRepository'
 
 export class PrismaActivityRepository implements IActivityRepository {
@@ -16,8 +16,8 @@ export class PrismaActivityRepository implements IActivityRepository {
                 due_date,
                 start_date,
                 responsible_id,
-                progress_status: !progress_status ? undefined : progress_status as ProgressStatusActivity,
-                type_node: type_node as unknown as NodeTypeActivity
+                progress_status: progress_status ? progress_status : ProgressStatusActivity.DO_TO,
+                type_node: type_node ? type_node : NodeTypeActivity.INITIAL,
             }
         });
 
@@ -42,7 +42,7 @@ export class PrismaActivityRepository implements IActivityRepository {
             responsible_id,
             start_date: !start_date ? undefined : start_date,
             due_date: !due_date ? undefined : due_date,
-            progress_status,
+            progress_status: progress_status as unknown as STATUSACTIVITY,
             type_node: type_node as unknown as TYPENODE
         }, activityExists.id)
 
@@ -65,7 +65,7 @@ export class PrismaActivityRepository implements IActivityRepository {
                 responsible_id,
                 due_date: !due_date ? undefined : due_date,
                 start_date: !start_date ? undefined : start_date,
-                progress_status,
+                progress_status: progress_status as unknown as STATUSACTIVITY,
                 type_node: type_node as unknown as TYPENODE
             }, id)
             activitiesInMemory.push(activityInMemory);
@@ -94,7 +94,7 @@ export class PrismaActivityRepository implements IActivityRepository {
             due_date: due_date || undefined,
             start_date: !start_date ? undefined : start_date,
             responsible_id: responsible_id,
-            progress_status: progress_status as ProgressStatusActivity || undefined,
+            progress_status: progress_status as unknown as STATUSACTIVITY || undefined,
             type_node: type_node as unknown as TYPENODE
         }, id)
 
@@ -126,7 +126,7 @@ export class PrismaActivityRepository implements IActivityRepository {
             responsible_id,
             due_date: !due_date ? undefined : due_date,
             start_date: !start_date ? undefined : start_date,
-            progress_status: progress_status as ProgressStatusActivity || undefined,
+            progress_status: progress_status as unknown as STATUSACTIVITY || undefined,
             type_node: type_node as unknown as TYPENODE
         }, id);
 
@@ -151,7 +151,7 @@ export class PrismaActivityRepository implements IActivityRepository {
                 due_date: activityChangeData.due_date || undefined,
                 start_date: activityChangeData.start_date || undefined,
                 responsible_id: activityChangeData.responsible_id || undefined,
-                progress_status: activityChangeData.progress_status as ProgressStatusActivity || undefined,
+                progress_status: activityChangeData.progress_status as unknown as ProgressStatusActivity || undefined,
                 type_node: activityChangeData.type_node ? activityChangeData.type_node as unknown as NodeTypeActivity : undefined
             }
         })
@@ -164,7 +164,7 @@ export class PrismaActivityRepository implements IActivityRepository {
             responsible_id,
             due_date: !due_date ? undefined : due_date,
             start_date: !start_date ? undefined : start_date,
-            progress_status,
+            progress_status: progress_status as unknown as STATUSACTIVITY,
             type_node: type_node as unknown as TYPENODE
         }, id);
 

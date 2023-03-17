@@ -39,7 +39,8 @@ export class PrismaMessageActivityRepository implements IMessagaActivityReposito
 
         return {
             activity_id: messageInDatabase.activity_id,
-            user_id: messageInDatabase.user_id
+            user_id: messageInDatabase.user_id,
+            publication_date: messageInDatabase.publication_date
         } as IRecordMessageIdProps;
     }
     async findAll(): Promise<MessageActivity[] | null> {
@@ -178,9 +179,8 @@ export class PrismaMessageActivityRepository implements IMessagaActivityReposito
             },
             data: {
                 content,
-                publication_date,
                 updated_at: updated_at ?? new Date(),
-                type_message: type_message ? type_message as unknown as TypeMessage : undefined
+                type_message: type_message
             }
         });
 
@@ -188,7 +188,7 @@ export class PrismaMessageActivityRepository implements IMessagaActivityReposito
             content: messageUpdated.content,
             publication_date: messageUpdated.publication_date,
             updated_at: messageUpdated.updated_at,
-            type_message: type_message as unknown as TYPEMESSAGE,
+            type_message: type_message as TYPEMESSAGE,
             activity_id: messageUpdated.activity_id,
             user_id: messageUpdated.user_id
         });

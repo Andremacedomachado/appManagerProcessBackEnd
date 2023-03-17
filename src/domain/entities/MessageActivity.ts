@@ -1,7 +1,7 @@
 
 export enum TYPEMESSAGE {
-    'SYSTEM',
-    'USER'
+    SYSTEM = 'SYSTEM',
+    USER = 'USER'
 }
 
 export interface IMessageActivityProps {

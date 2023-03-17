@@ -1,10 +1,10 @@
-import { IMessageActivityProps, MessageActivity } from "../../domain/entities/MessageActivity";
+import { IMessageActivityProps, MessageActivity, TYPEMESSAGE } from "../../domain/entities/MessageActivity";
 
 export type IMessageActivityUpdateProps = {
     content?: string,
     publication_date: Date,
     updated_at?: Date,
-    type_message?: string,
+    type_message?: TYPEMESSAGE,
     activity_id: string,
     user_id: string
 }

@@ -1,3 +1,4 @@
+import { User } from "../../domain/entities/User"
 
 export type IUserFullInfo = {
     id: string,
@@ -27,4 +28,5 @@ export interface IUserIntegrationRepository {
     saveChange(): Promise<void>,
     createUserWithRole(): Promise<string | Error>,
     getFullInfoUser(id: string): Promise<IUserFullInfo | Error>,
+    getAllUserBySector(sectorId: string): Promise<User[] | Error>,
 }

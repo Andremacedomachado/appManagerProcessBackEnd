@@ -36,6 +36,7 @@ import { createAnnexActivityController } from './application/usecases/createAnne
 import { getAnnexActivityInfoUController } from './application/usecases/getAnnexActivityInfo';
 import { getAnnexFilecontroller } from './application/usecases/getAnnexFile';
 import { deleteAnnexActivityController } from './application/usecases/deleteAnnexActivity';
+import { getAllUserBySectorController } from './application/usecases/getAllUserBySector';
 
 const routes = Router();
 
@@ -192,4 +193,10 @@ routes.get('/annexActivity/file', isAuthenticated(), (req: Request, res: Respons
 
 routes.delete('/annexActivity', isAuthenticated(), (req: Request, res: Response) => {
     return deleteAnnexActivityController.handle(req, res)
+})
+
+//routes UserIntegration
+
+routes.get('/users/sector', isAuthenticated(), (req: Request, res: Response) => {
+    return getAllUserBySectorController.handle(req, res)
 })

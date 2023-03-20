@@ -126,4 +126,29 @@ export class PrismaUserRepository implements IUserRepository {
 
         return userUpdatedInMemory
     }
+
+    async getManyBySector(sectorId: string): Promise<User[] | null> {
+        const usersInSector = await prisma.user.findMany({
+            where: {
+                organization_sector_id: sectorId
+            }
+        })
+
+        if (usersInSector.length == 0) {
+            return [] as User[]
+        }
+        const userInMemory = usersInSector.map(userIndatabase => {
+            const { created_at, email, id, name, organization_sector_id, password, status, updated_at } = userIndatabase
+            return User.create({
+                name,
+                email,
+                created_at,
+                updated_at,
+                password,
+                status: <UserIsActive>status,
+                organization_sector_id
+            }, id)
+        })
+        return userInMemory
+    }
 }

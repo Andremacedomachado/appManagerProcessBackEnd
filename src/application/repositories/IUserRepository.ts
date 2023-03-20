@@ -22,4 +22,5 @@ export interface IUserRepository {
     findByEmail(email: string): Promise<User | null>
     findAll(): Promise<User[] | null>
     update(user: IUserUpdateProps): Promise<User | null>
+    getManyBySector(sectorId: string): Promise<User[] | null>
 }

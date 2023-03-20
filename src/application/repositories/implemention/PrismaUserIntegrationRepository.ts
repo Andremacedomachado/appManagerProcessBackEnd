@@ -3,6 +3,7 @@ import { IUserRepository } from "../IUserRepository";
 import { IUserOnRolesRepository } from "../IUserOnRolesRepository";
 import { IUserFullInfo, IUserIntegrationRepository, organizationInfo, roleInfo } from "../IUserIntegrationRepository";
 import { IOrganizationSectorRepository } from "../IOrganizationSectorRepository";
+import { User } from "../../../domain/entities/User";
 
 
 
@@ -80,6 +81,18 @@ export class PrismaUserIntegrationRepository implements IUserIntegrationReposito
 
             return userInfo;
         }
+    }
+
+    async getAllUserBySector(sectorId: string): Promise<User[] | Error> {
+        const sectorExists = await this.organizationSectorRepository.findById(sectorId);
+        if (!sectorExists) {
+            return new Error('Sector not Exists');
+        }
+        const collectionUserOfSector = await this.userRepository.getManyBySector(sectorExists.id)
+        if (!collectionUserOfSector) {
+            return new Error('Not exists Users link the Sector')
+        }
+        return collectionUserOfSector;
     }
 
 }

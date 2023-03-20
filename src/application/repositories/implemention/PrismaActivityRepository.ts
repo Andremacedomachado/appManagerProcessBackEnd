@@ -25,7 +25,7 @@ export class PrismaActivityRepository implements IActivityRepository {
     }
 
     async findById(activityId: string): Promise<Activity | null> {
-        const activityExists = await prisma.activity.findFirst({
+        const activityExists = await prisma.activity.findUnique({
             where: {
                 id: activityId
             }

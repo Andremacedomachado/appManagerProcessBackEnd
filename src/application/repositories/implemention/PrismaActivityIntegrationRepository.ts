@@ -1,11 +1,11 @@
 import { prisma } from "../../../database";
-import { Activity, TYPENODE } from "../../../domain/entities/Activity";
+import { Activity, STATUSACTIVITY, TYPENODE } from "../../../domain/entities/Activity";
 import { RecordCollaborator } from "../../../domain/entities/RecordCollaborator";
 import { IActivityIntegrationRepository, IActivityTree, ICollectionActivityTreeFullInfo } from "../IActivityIntegrationRepository";
 import { IActivityRepository } from "../IActivityRepository";
 import { ICollaboratorRepository } from "../ICollaboratorReposytory";
 import { IUserRepository } from "../IUserRepository";
-import { ProgressStatusActivity, ActivityRelationship, NodeTypeActivity } from '@prisma/client';
+import { ProgressStatusActivity, ActivityRelationship } from '@prisma/client';
 
 export class PrismaActivityIntegrationRepository implements IActivityIntegrationRepository {
     constructor(
@@ -37,28 +37,23 @@ export class PrismaActivityIntegrationRepository implements IActivityIntegration
 
         do {
             const actvityRootNode = await this.findRootNodeById(recordsNotFound[0].activity_id);
-            const activitytreeInDatabase = await this.findTreeDescendant(actvityRootNode?.id as string);
-            const actvityTree: IActivityTree = {
-                activities: []
+            if (!actvityRootNode) {
+                return new Error('Error relacion colaborator and activity not exist')
             }
-            activitytreeInDatabase?.forEach((activitiNode) => {
-                const activitiInformat = activitiNode as Activity;
-                const { title, description, responsible_id, created_at, updated_at, due_date, start_date, progress_status, type_node } = activitiInformat.props;
-                actvityTree.activities.push({
-                    id: activitiInformat.id,
-                    props: {
-                        title,
-                        description,
-                        responsible_id,
-                        created_at,
-                        updated_at,
-                        due_date,
-                        start_date,
-                        progress_status,
-                        type_node: type_node as unknown as TYPENODE
-                    },
-                });
-            });
+
+            const activitytreeInDatabase = await this.findTreeDescendant(actvityRootNode.id);
+            if (!activitytreeInDatabase) {
+                return new Error('Error activity not exist')
+            }
+
+            var actvityTree: IActivityTree = {
+                activities: []
+            };
+
+            activitytreeInDatabase?.forEach(activityCurrent => {
+                actvityTree.activities.push(activityCurrent);
+            })
+
             const collaboratorsActivityTreeCurrent = await this.collaboratorRepository.findByActivityId(recordsNotFound[0].activity_id);
             actvityTree.collaborators = collaboratorsActivityTreeCurrent as RecordCollaborator[];
             collectionTree.collectionsActivityTree.push(actvityTree);
@@ -69,7 +64,7 @@ export class PrismaActivityIntegrationRepository implements IActivityIntegration
                 })
             });
 
-        } while (recordsNotFound.length != 0);
+        } while (recordsNotFound.length > 0);
 
         return collectionTree;
     }
@@ -80,8 +75,6 @@ export class PrismaActivityIntegrationRepository implements IActivityIntegration
             return null;
         }
 
-        console.log('entrou infra');
-
         const activityTreeDependency = await prisma.$queryRaw<ActivityRelationship[]>`WITH RECURSIVE parents(parent_id, children_id, dependency_link_date) AS (
             SELECT parent_id, children_id, dependency_link_date  FROM public."activityRelationship"
                 WHERE parent_id = ${activityId}
@@ -91,6 +84,9 @@ export class PrismaActivityIntegrationRepository implements IActivityIntegration
         )
         SELECT * FROM parents`;
 
+        if (activityTreeDependency.length == 0) {
+            return [activityRoot]
+        }
         const collectionActivityIds: string[] = []
         activityTreeDependency.forEach((record, index) => {
             if (!collectionActivityIds.includes(record.parent_id)) {
@@ -119,13 +115,11 @@ export class PrismaActivityIntegrationRepository implements IActivityIntegration
                 responsible_id,
                 due_date: !due_date ? undefined : due_date,
                 start_date: !start_date ? undefined : start_date,
-                progress_status,
+                progress_status: progress_status as STATUSACTIVITY,
                 type_node: type_node as unknown as TYPENODE
             }, id);
 
         })
-
-        console.log('ids: ', collectionActivityIds)
 
         return activitiesInMemory
     }
@@ -145,6 +139,10 @@ export class PrismaActivityIntegrationRepository implements IActivityIntegration
         )
         SELECT * FROM parents`;
 
+        if (activityTreeDependency.length == 0) {
+            return activityRoot
+        }
+
         const collectionActivityIds: string[] = []
         activityTreeDependency.forEach((record, index) => {
             if (!collectionActivityIds.includes(record.parent_id)) {
@@ -155,7 +153,6 @@ export class PrismaActivityIntegrationRepository implements IActivityIntegration
             }
         })
 
-        console.log(collectionActivityIds);
 
         const activityInDatabase = await prisma.activity.findFirst({
             where: {
@@ -180,7 +177,7 @@ export class PrismaActivityIntegrationRepository implements IActivityIntegration
             responsible_id,
             due_date: !due_date ? undefined : due_date,
             start_date: !start_date ? undefined : start_date,
-            progress_status,
+            progress_status: progress_status as STATUSACTIVITY,
             type_node: type_node as unknown as TYPENODE
         }, id);
 

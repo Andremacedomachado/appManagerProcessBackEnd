@@ -1,6 +1,4 @@
 import { IActivityIntegrationRepository } from "../../repositories/IActivityIntegrationRepository";
-import { IActivityRepository } from "../../repositories/IActivityRepository";
-
 export class GetRootNodeActivityTreeUseCase {
     constructor(private activityIntegrationRepository: IActivityIntegrationRepository) { }
 

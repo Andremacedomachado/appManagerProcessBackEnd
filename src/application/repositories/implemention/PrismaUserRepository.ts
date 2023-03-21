@@ -100,6 +100,13 @@ export class PrismaUserRepository implements IUserRepository {
             return null;
         }
 
+        if (userChangeData.email) {
+            const userWithEmailInUse = await this.findByEmail(userChangeData.email);
+            if (userWithEmailInUse && userChangeData.id != userWithEmailInUse.id) {
+                return null;
+            }
+        }
+
         const userUpdatedInDatabase = await prisma.user.update({
             where: {
                 id: userChangeData.id
@@ -109,7 +116,6 @@ export class PrismaUserRepository implements IUserRepository {
                 email: userChangeData.email || undefined,
                 password: userChangeData.password || undefined,
                 updated_at: new Date,
-                organization_sector_id: userChangeData.organization_sector_id || undefined,
                 status: userChangeData.status || undefined
             }
         })

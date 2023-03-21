@@ -38,6 +38,7 @@ import { getAnnexFilecontroller } from './application/usecases/getAnnexFile';
 import { deleteAnnexActivityController } from './application/usecases/deleteAnnexActivity';
 import { getAllUserBySectorController } from './application/usecases/getAllUserBySector';
 import { getAllUserByOrganizationController } from './application/usecases/getAllUserByOrganization';
+import { updateUserController } from './application/usecases/updateUser';
 
 const routes = Router();
 
@@ -68,6 +69,10 @@ routes.post('/user/roles', isAuthenticated(), (req: Request, res: Response) => {
 
 routes.post('/user', isAuthenticated(), (req: Request, res: Response) => {
     return changeWorkerStatusController.handle(req, res);
+});
+
+routes.put('/users', isAuthenticated(), (req: Request, res: Response) => {
+    return updateUserController.handle(req, res);
 });
 
 //routes login

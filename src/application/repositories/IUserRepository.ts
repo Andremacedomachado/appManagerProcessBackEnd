@@ -13,7 +13,6 @@ export type IUserUpdateProps = {
     status?: UserStatus,
     created_at?: Date,
     updated_at?: Date,
-    organization_sector_id?: string,
 }
 
 export interface IUserRepository {

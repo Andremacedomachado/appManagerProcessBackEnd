@@ -24,10 +24,17 @@ export type organizationInfo = {
     organizationName: string,
     dateLinkSector: Date,
 }
+
+export type ChangeSectorData = {
+    userId: string,
+    organization_sector_id: string,
+}
+
 export interface IUserIntegrationRepository {
     saveChange(): Promise<void>,
     createUserWithRole(): Promise<string | Error>,
     getFullInfoUser(id: string): Promise<IUserFullInfo | Error>,
     getAllUserBySector(sectorId: string): Promise<User[] | Error>,
     getAllUserByOrganization(organizationId: string): Promise<User[] | Error>
+    changeUserSector(dataChange: ChangeSectorData): Promise<User | Error>
 }

@@ -39,6 +39,7 @@ import { deleteAnnexActivityController } from './application/usecases/deleteAnne
 import { getAllUserBySectorController } from './application/usecases/getAllUserBySector';
 import { getAllUserByOrganizationController } from './application/usecases/getAllUserByOrganization';
 import { updateUserController } from './application/usecases/updateUser';
+import { changeSectorUserController } from './application/usecases/changeSectorUser';
 
 const routes = Router();
 
@@ -205,6 +206,10 @@ routes.delete('/annexActivity', isAuthenticated(), (req: Request, res: Response)
 
 routes.get('/users/sector', isAuthenticated(), (req: Request, res: Response) => {
     return getAllUserBySectorController.handle(req, res)
+})
+
+routes.put('/users/sector', isAuthenticated(), (req: Request, res: Response) => {
+    return changeSectorUserController.handle(req, res)
 })
 
 routes.get('/users/organization', isAuthenticated(), (req: Request, res: Response) => {

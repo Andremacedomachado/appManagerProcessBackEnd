@@ -1,7 +1,7 @@
 import { IRoleRepository } from "../IRoleRepository";
 import { IUserRepository } from "../IUserRepository";
 import { IUserOnRolesRepository } from "../IUserOnRolesRepository";
-import { IUserFullInfo, IUserIntegrationRepository, organizationInfo, roleInfo } from "../IUserIntegrationRepository";
+import { ChangeSectorData, IUserFullInfo, IUserIntegrationRepository, organizationInfo, roleInfo } from "../IUserIntegrationRepository";
 import { IOrganizationSectorRepository } from "../IOrganizationSectorRepository";
 import { User } from "../../../domain/entities/User";
 import { IOrganizationRepository } from "../IOrganizationRepository";
@@ -116,5 +116,24 @@ export class PrismaUserIntegrationRepository implements IUserIntegrationReposito
         }
 
         return await functionAsyncGetUsersInOrganization(sectorsInOrganization);
+    }
+
+    async changeUserSector(dataChange: ChangeSectorData): Promise<User | Error> {
+        const { userId: id, organization_sector_id } = dataChange;
+        const userExists = await this.userRepository.findById(id);
+        if (!userExists) {
+            return new Error('User not exists');
+        }
+
+        const sectorExists = await this.organizationSectorRepository.findById(organization_sector_id);
+        if (!sectorExists) {
+            return new Error('Sector not exists');
+        }
+
+        const userUpdated = await this.userRepository.update({ id, organization_sector_id })
+        if (!userUpdated) {
+            return new Error('User not exists');
+        }
+        return userUpdated;
     }
 }

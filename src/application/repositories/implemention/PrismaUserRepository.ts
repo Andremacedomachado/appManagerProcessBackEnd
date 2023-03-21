@@ -115,6 +115,7 @@ export class PrismaUserRepository implements IUserRepository {
                 name: userChangeData.name || undefined,
                 email: userChangeData.email || undefined,
                 password: userChangeData.password || undefined,
+                organization_sector_id: userChangeData.organization_sector_id || undefined,
                 updated_at: new Date,
                 status: userChangeData.status || undefined
             }

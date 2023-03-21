@@ -29,4 +29,5 @@ export interface IUserIntegrationRepository {
     createUserWithRole(): Promise<string | Error>,
     getFullInfoUser(id: string): Promise<IUserFullInfo | Error>,
     getAllUserBySector(sectorId: string): Promise<User[] | Error>,
+    getAllUserByOrganization(organizationId: string): Promise<User[] | Error>
 }

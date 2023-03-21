@@ -9,5 +9,6 @@ export interface IOrganizationSectorRepository {
     findById(id: string): Promise<OrganizationSector | null>
     findByName(name: string): Promise<OrganizationSector | null>,
     findAll(): Promise<OrganizationSector[] | null>,
-    findManyByIds(organizationIds: string[]): Promise<OrganizationSector[] | null>
+    findManyByIds(organizationIds: string[]): Promise<OrganizationSector[] | null>,
+    findSectorsByOrganizationId(organizationId: string): Promise<OrganizationSector[]>
 }

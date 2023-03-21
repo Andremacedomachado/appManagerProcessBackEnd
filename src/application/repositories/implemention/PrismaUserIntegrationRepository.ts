@@ -4,6 +4,8 @@ import { IUserOnRolesRepository } from "../IUserOnRolesRepository";
 import { IUserFullInfo, IUserIntegrationRepository, organizationInfo, roleInfo } from "../IUserIntegrationRepository";
 import { IOrganizationSectorRepository } from "../IOrganizationSectorRepository";
 import { User } from "../../../domain/entities/User";
+import { IOrganizationRepository } from "../IOrganizationRepository";
+import { OrganizationSector } from "../../../domain/entities/OrganizationSector";
 
 
 
@@ -12,7 +14,8 @@ export class PrismaUserIntegrationRepository implements IUserIntegrationReposito
         private userRepository: IUserRepository,
         private roleRepository: IRoleRepository,
         private userOnRoleRepository: IUserOnRolesRepository,
-        private organizationSectorRepository: IOrganizationSectorRepository
+        private organizationSectorRepository: IOrganizationSectorRepository,
+        private organizationRepository: IOrganizationRepository,
     ) {
     }
     async saveChange(): Promise<void> {
@@ -94,5 +97,24 @@ export class PrismaUserIntegrationRepository implements IUserIntegrationReposito
         }
         return collectionUserOfSector;
     }
+    async getAllUserByOrganization(organizationId: string): Promise<Error | User[]> {
+        const organizationExists = await this.organizationRepository.findById(organizationId)
+        if (!organizationExists) {
+            return new Error('Organization not exist');
+        }
+        const sectorsInOrganization = await this.organizationSectorRepository.findSectorsByOrganizationId(organizationExists.id);
+        if (sectorsInOrganization.length == 0) {
+            return [] as User[];
+        }
+        const functionAsyncGetUsersInOrganization = async (sectorsInOrganization: OrganizationSector[]) => {
+            var collectionUsersInOrganization: User[] = [];
 
+            for (const sector of sectorsInOrganization) {
+                collectionUsersInOrganization.push(... await this.userRepository.getManyBySector(sector.id))
+            }
+            return collectionUsersInOrganization
+        }
+
+        return await functionAsyncGetUsersInOrganization(sectorsInOrganization);
+    }
 }

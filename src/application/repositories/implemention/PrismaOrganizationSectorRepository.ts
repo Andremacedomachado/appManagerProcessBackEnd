@@ -123,4 +123,22 @@ export class PrismaOrganizationSectorRepository implements IOrganizationSectorRe
         return sectorsInMemory;
     }
 
+    async findSectorsByOrganizationId(organizationId: string): Promise<OrganizationSector[]> {
+        const sectorsInDatabase = await prisma.organizationSector.findMany({
+            where: {
+                organization_id: organizationId
+            }
+        });
+
+        if (sectorsInDatabase.length == 0) {
+            return [] as OrganizationSector[]
+        }
+
+        const sectorsInMemory = sectorsInDatabase.map(sector => {
+            const { created_at, employees_allocated, id, name, organization_id, updated_at } = sector
+            return OrganizationSector.create({ created_at, employeesAllocated: employees_allocated, name, organization_id, updated_at }, id)
+        })
+
+        return sectorsInMemory;
+    }
 }

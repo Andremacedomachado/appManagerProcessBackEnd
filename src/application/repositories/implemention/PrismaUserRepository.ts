@@ -127,7 +127,7 @@ export class PrismaUserRepository implements IUserRepository {
         return userUpdatedInMemory
     }
 
-    async getManyBySector(sectorId: string): Promise<User[] | null> {
+    async getManyBySector(sectorId: string): Promise<User[]> {
         const usersInSector = await prisma.user.findMany({
             where: {
                 organization_sector_id: sectorId

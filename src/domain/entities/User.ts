@@ -12,7 +12,7 @@ export type IUserProps = {
     status: UserIsActive,
     created_at?: Date,
     updated_at?: Date,
-    organization_sector_id: string,
+    organization_sector_id: string | null,
 }
 
 

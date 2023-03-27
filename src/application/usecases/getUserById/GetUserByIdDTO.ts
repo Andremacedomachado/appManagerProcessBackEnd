@@ -25,6 +25,6 @@ export const UserFullInfoResponseSchema = z.object({
     created_at: z.date(),
     updated_at: z.date(),
     status: z.enum([UserIsActive.ACTIVE, UserIsActive.INACTIVE]),
-    organization_linked: SectorResponseSchema,
+    organization_linked: z.union([SectorResponseSchema, z.null()]),
     roles: z.array(RoleResponseSchema).optional()
 });

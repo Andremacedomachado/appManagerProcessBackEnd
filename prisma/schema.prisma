@@ -31,9 +31,9 @@ model User {
     updated_at DateTime   @updatedAt
 
     registerRole           UsersOnRoles[]
-    registerAdjuster       UsersOnRoles[]     @relation("FK_adjuster")
-    linked_sector          OrganizationSector @relation(fields: [organization_sector_id], references: [id])
-    organization_sector_id String
+    registerAdjuster       UsersOnRoles[]      @relation("FK_adjuster")
+    linked_sector          OrganizationSector? @relation(fields: [organization_sector_id], references: [id])
+    organization_sector_id String?
     ActivitiesResponsible  Activity[]
     Collaborators          Collaborators[]
     Annex                  Annex[]
@@ -89,8 +89,8 @@ model OrganizationSector {
     updated_at          DateTime @updatedAt
     employees_allocated Int      @default(0)
 
-    organizationId  Organization @relation(fields: [organization_id], references: [id])
-    organization_id String
+    organizationId  Organization? @relation(fields: [organization_id], references: [id])
+    organization_id String?
 
     User User[]
 

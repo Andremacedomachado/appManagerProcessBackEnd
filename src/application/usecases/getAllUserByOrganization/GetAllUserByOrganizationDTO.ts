@@ -12,7 +12,7 @@ export const UserByOrganizationResponseSchema = z.object({
     created_at: z.date(),
     updated_at: z.date(),
     status: z.enum([UserIsActive.ACTIVE, UserIsActive.INACTIVE]),
-    organization_sector_id: z.string().uuid(),
+    organization_sector_id: z.union([z.string().uuid(), z.null()]),
 })
 export type UserByOrganizationResponseDTO = z.input<typeof UserByOrganizationResponseSchema>
 export const GetAllUserByOrganizationResponseSchema = z.array(UserByOrganizationResponseSchema);

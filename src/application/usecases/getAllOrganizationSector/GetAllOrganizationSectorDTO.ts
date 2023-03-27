@@ -15,7 +15,7 @@ export const OrganizationSectorResponseSchema = z.object({
     created_at: z.date(),
     updated_at: z.date(),
     employeesAllocated: z.number().nonnegative(),
-    organization_id: z.string().uuid()
+    organization_id: z.union([z.string().uuid(), z.null()])
 })
 
 export const GetAllOrganizationSectorResponseSchema = z.array(OrganizationSectorResponseSchema);

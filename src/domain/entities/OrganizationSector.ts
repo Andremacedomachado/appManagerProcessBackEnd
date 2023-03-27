@@ -5,7 +5,7 @@ export interface IOrganizationSectorProps {
     employeesAllocated: number,
     created_at?: Date,
     updated_at?: Date,
-    organization_id: string
+    organization_id: string | null
 }
 
 export class OrganizationSector extends Entity<IOrganizationSectorProps>{

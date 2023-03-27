@@ -13,7 +13,7 @@ export const ChangeSectorUserResponseSchema = z.object({
     email: z.string().email(),
     name: z.string(),
     status: z.enum([UserIsActive.ACTIVE, UserIsActive.INACTIVE]),
-    organization_sector_id: z.string().uuid(),
+    organization_sector_id: z.union([z.string().uuid(), z.null()]),
     created_at: z.date(),
     updated_at: z.date()
 })

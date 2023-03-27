@@ -7,7 +7,7 @@ export type IUserFullInfo = {
     status: string,
     created_at?: Date,
     updated_at?: Date,
-    organization_linked: organizationInfo,
+    organization_linked: organizationInfo | null,
     roles: roleInfo[],
 
 }

@@ -40,6 +40,7 @@ import { getAllUserBySectorController } from './application/usecases/getAllUserB
 import { getAllUserByOrganizationController } from './application/usecases/getAllUserByOrganization';
 import { updateUserController } from './application/usecases/updateUser';
 import { changeSectorUserController } from './application/usecases/changeSectorUser';
+import { updateManyUserController } from './application/usecases/updateManyUser';
 
 const routes = Router();
 
@@ -76,6 +77,9 @@ routes.put('/users', isAuthenticated(), (req: Request, res: Response) => {
     return updateUserController.handle(req, res);
 });
 
+routes.put('/users/many', isAuthenticated(), (req: Request, res: Response) => {
+    return updateManyUserController.handle(req, res);
+});
 //routes login
 
 routes.post('/login', (req: Request, res: Response) => {

@@ -15,6 +15,16 @@ export type IUserUpdateProps = {
     updated_at?: Date,
     organization_sector_id?: string | null,
 }
+export type IUserUpdateManyProps = {
+    ids: string[],
+    name?: string,
+    email?: string,
+    password?: string,
+    status?: UserStatus,
+    created_at?: Date,
+    updated_at?: Date,
+    organization_sector_id?: string | null,
+}
 
 export interface IUserRepository {
     save(user: User): Promise<UserId | null>
@@ -23,4 +33,5 @@ export interface IUserRepository {
     findAll(): Promise<User[] | null>
     update(user: IUserUpdateProps): Promise<User | null>
     getManyBySector(sectorId: string): Promise<User[]>
+    updatedMany(dataChangeMany: IUserUpdateManyProps): Promise<User[]>
 }

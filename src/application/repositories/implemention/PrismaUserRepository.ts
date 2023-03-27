@@ -1,5 +1,5 @@
 import { hash } from 'bcryptjs';
-import { IUserRepository, IUserUpdateProps, UserId } from '../IUserRepository';
+import { IUserRepository, IUserUpdateManyProps, IUserUpdateProps, UserId } from '../IUserRepository';
 
 import { prisma } from '../../../database';
 import { User, UserIsActive } from '../../../domain/entities/User';
@@ -157,5 +157,32 @@ export class PrismaUserRepository implements IUserRepository {
             }, id)
         })
         return userInMemory
+    }
+
+    async updatedMany(userChangeData: IUserUpdateManyProps): Promise<User[]> {
+        await prisma.user.updateMany({
+            where: {
+                id: {
+                    in: userChangeData.ids
+                }
+            },
+            data: {
+                name: userChangeData.name || undefined,
+                password: userChangeData.password || undefined,
+                organization_sector_id: userChangeData.organization_sector_id == null || userChangeData.organization_sector_id ? userChangeData.organization_sector_id : undefined,
+                updated_at: userChangeData.updated_at ?? new Date,
+                status: userChangeData.status || undefined
+            }
+        });
+        const userUpdated = await prisma.user.findMany({
+            where: {
+                id: { in: userChangeData.ids }
+            }
+        })
+        const usersInMemory = userUpdated.map(user => {
+            const { created_at, email, id, name, organization_sector_id, password, status, updated_at } = user;
+            return User.create({ created_at, email, name, organization_sector_id, password, status: <UserIsActive>status, updated_at }, id)
+        })
+        return usersInMemory;
     }
 }

@@ -30,7 +30,8 @@ export class PrismaUserIntegrationRepository implements IUserIntegrationReposito
             return new Error("User not exist");
         }
         const recordRoles = await this.userOnRoleRepository.findByUserId(useInfoInitial.id);
-        const serctorAllocated = await this.organizationSectorRepository.findById(useInfoInitial.props.organization_sector_id);
+
+
         if (recordRoles) {
             const seacherIds = recordRoles.map(record => record.role_id)
             const roleInfo = await this.roleRepository.findManyByIds(seacherIds);
@@ -42,13 +43,28 @@ export class PrismaUserIntegrationRepository implements IUserIntegrationReposito
                     dateLinkRole: recordRoles[index].created_at
                 } as roleInfo;
             }) : [];
+            var sectorAllocated: OrganizationSector | null = null;
+            if (useInfoInitial.props.organization_sector_id != null) {
+                sectorAllocated = await this.organizationSectorRepository.findById(useInfoInitial.props.organization_sector_id);
+                const organizationInsert = {
+                    organizationId: sectorAllocated?.id,
+                    dateLinkSector: sectorAllocated?.props.created_at,
+                    organizationName: sectorAllocated?.props.name,
+                } as organizationInfo;
 
+                const userInfo: IUserFullInfo = {
+                    id: useInfoInitial.id,
+                    email: useInfoInitial.props.email,
+                    name: useInfoInitial.props.name,
+                    created_at: useInfoInitial.props.created_at,
+                    updated_at: useInfoInitial.props.updated_at,
+                    status: useInfoInitial.props.status,
 
-            const organizationInsert = {
-                organizationId: serctorAllocated?.id,
-                dateLinkSector: serctorAllocated?.props.created_at,
-                organizationName: serctorAllocated?.props.name,
-            } as organizationInfo;
+                    organization_linked: organizationInsert,
+                    roles: recordRoleInsert
+                };
+                return userInfo;
+            }
 
             const userInfo: IUserFullInfo = {
                 id: useInfoInitial.id,
@@ -58,17 +74,34 @@ export class PrismaUserIntegrationRepository implements IUserIntegrationReposito
                 updated_at: useInfoInitial.props.updated_at,
                 status: useInfoInitial.props.status,
 
-                organization_linked: organizationInsert,
+                organization_linked: null,
                 roles: recordRoleInsert
             };
 
             return userInfo;
         } else {
-            const organizationInsert = {
-                organizationId: serctorAllocated?.id,
-                dateLinkSector: serctorAllocated?.props.created_at,
-                organizationName: serctorAllocated?.props.name,
-            } as organizationInfo;
+            if (useInfoInitial.props.organization_sector_id != null) {
+                const sectorAllocated: OrganizationSector | null = await this.organizationSectorRepository.findById(useInfoInitial.props.organization_sector_id);
+                const organizationInsert = {
+                    organizationId: sectorAllocated?.id,
+                    dateLinkSector: sectorAllocated?.props.created_at,
+                    organizationName: sectorAllocated?.props.name,
+                } as organizationInfo;
+
+                const userInfo: IUserFullInfo = {
+                    id: useInfoInitial.id,
+                    email: useInfoInitial.props.email,
+                    name: useInfoInitial.props.name,
+                    created_at: useInfoInitial.props.created_at,
+                    updated_at: useInfoInitial.props.updated_at,
+                    status: useInfoInitial.props.status,
+
+                    organization_linked: organizationInsert,
+                    roles: [],
+                };
+
+                return userInfo
+            }
 
             const userInfo: IUserFullInfo = {
                 id: useInfoInitial.id,
@@ -78,7 +111,7 @@ export class PrismaUserIntegrationRepository implements IUserIntegrationReposito
                 updated_at: useInfoInitial.props.updated_at,
                 status: useInfoInitial.props.status,
 
-                organization_linked: organizationInsert,
+                organization_linked: null,
                 roles: [],
             };
 

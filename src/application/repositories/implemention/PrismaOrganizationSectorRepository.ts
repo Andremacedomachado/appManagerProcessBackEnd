@@ -1,3 +1,4 @@
+import { Prisma } from "@prisma/client";
 import { prisma } from "../../../database";
 import { OrganizationSector } from "../../../domain/entities/OrganizationSector";
 
@@ -138,6 +139,25 @@ export class PrismaOrganizationSectorRepository implements IOrganizationSectorRe
             const { created_at, employees_allocated, id, name, organization_id, updated_at } = sector
             return OrganizationSector.create({ created_at, employeesAllocated: employees_allocated, name, organization_id, updated_at }, id)
         })
+
+        return sectorsInMemory;
+    }
+
+    async findAllSectorByOrganization(organization_id: string): Promise<OrganizationSector[] | Error> {
+        const sectorsInDatabase = await prisma.organizationSector.findMany({
+            where: {
+                organization_id
+            }
+        })
+
+        if (sectorsInDatabase.length == 0) {
+            return new Error('Organization without Sectors or Organization not exists')
+        }
+
+        const sectorsInMemory = sectorsInDatabase.map(sector => {
+            const { id, created_at, employees_allocated, name, organization_id, updated_at } = sector
+            return OrganizationSector.create({ created_at, employeesAllocated: employees_allocated, name, organization_id, updated_at }, id);
+        });
 
         return sectorsInMemory;
     }

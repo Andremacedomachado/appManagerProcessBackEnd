@@ -40,6 +40,7 @@ import { getAllUserBySectorController } from './application/usecases/getAllUserB
 import { getAllUserByOrganizationController } from './application/usecases/getAllUserByOrganization';
 import { updateUserController } from './application/usecases/updateUser';
 import { changeSectorUserController } from './application/usecases/changeSectorUser';
+import { getSectorsByOrganizationIdController } from './application/usecases/getSectorsByOrganizationId';
 import { updateManyUserController } from './application/usecases/updateManyUser';
 import { getUserByCollectionIdsController } from './application/usecases/getUserByCollectionIds';
 
@@ -125,6 +126,10 @@ routes.get('/sectors', isAuthenticated(), (req: Request, res: Response) => {
 
 routes.get('/sector', isAuthenticated(), (req: Request, res: Response) => {
     return getOrganizationSectorByIdController.handle(req, res);
+});
+
+routes.get('/sectors/byOrganization', isAuthenticated(), (req: Request, res: Response) => {
+    return getSectorsByOrganizationIdController.handle(req, res);
 });
 
 //routes Activities

@@ -193,5 +193,22 @@ export class PrismaMessageActivityRepository implements IMessagaActivityReposito
             user_id: messageUpdated.user_id
         });
     }
+    async delete(messageId: IRecordMessageIdProps): Promise<MessageActivity | null> {
+        const messageExists = await prisma.messageAtivity.findUnique({
+            where: {
+                activity_id_user_id_publication_date: messageId
+            }
+        })
+        if (!messageExists) {
+            return null;
+        }
+        const messageDeleted = await prisma.messageAtivity.delete({
+            where: {
+                activity_id_user_id_publication_date: messageId
+            }
+        })
+
+        return MessageActivity.create({ ...messageDeleted, type_message: messageDeleted.type_message as TYPEMESSAGE })
+    }
 
 }

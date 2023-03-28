@@ -18,9 +18,10 @@ export interface IRecordMessageIdProps {
 export interface IMessagaActivityRepository {
     save(message: MessageActivity): Promise<IRecordMessageIdProps | null>,
     findAll(): Promise<MessageActivity[] | null>,
-    findOne(messageId: IRecordMessageIdProps): Promise<MessageActivity | null>;
+    findOne(messageId: IRecordMessageIdProps): Promise<MessageActivity | null>,
     findManyByMessageContent(messageContent: string): Promise<MessageActivity[] | null>,
     findByAtivityId(activityId: string): Promise<MessageActivity[] | null>,
     findByUserId(userId: string): Promise<MessageActivity[] | null>,
     update(messageUpdate: IMessageActivityUpdateProps): Promise<MessageActivity | null>,
+    delete(messageId: IRecordMessageIdProps): Promise<MessageActivity | null>,
 }

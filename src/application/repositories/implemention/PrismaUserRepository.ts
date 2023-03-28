@@ -185,4 +185,16 @@ export class PrismaUserRepository implements IUserRepository {
         })
         return usersInMemory;
     }
+
+    async findManyByCollenctionIds(userIds: string[]): Promise<User[]> {
+
+        const userExists = await prisma.user.findMany({
+            where: { id: { in: userIds } }
+        })
+
+        return userExists.map(user => {
+            const { created_at, email, id, name, organization_sector_id, password, status, updated_at } = user;
+            return User.create({ created_at, email, name, organization_sector_id, password, status: <UserIsActive>status, updated_at }, id)
+        })
+    }
 }

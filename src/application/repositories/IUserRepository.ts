@@ -34,4 +34,5 @@ export interface IUserRepository {
     update(user: IUserUpdateProps): Promise<User | null>
     getManyBySector(sectorId: string): Promise<User[]>
     updatedMany(dataChangeMany: IUserUpdateManyProps): Promise<User[]>
+    findManyByCollenctionIds(userIds: string[]): Promise<User[]>
 }

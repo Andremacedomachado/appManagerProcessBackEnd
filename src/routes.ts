@@ -41,6 +41,7 @@ import { getAllUserByOrganizationController } from './application/usecases/getAl
 import { updateUserController } from './application/usecases/updateUser';
 import { changeSectorUserController } from './application/usecases/changeSectorUser';
 import { updateManyUserController } from './application/usecases/updateManyUser';
+import { getUserByCollectionIdsController } from './application/usecases/getUserByCollectionIds';
 
 const routes = Router();
 
@@ -59,6 +60,10 @@ routes.get('/users', isAuthenticated(), (req: Request, res: Response) => {
 
 routes.get('/user', isAuthenticated(), (req: Request, res: Response) => {
     return getUserByIdController.handle(req, res);
+});
+
+routes.get('/users/colletion', isAuthenticated(), (req: Request, res: Response) => {
+    return getUserByCollectionIdsController.handle(req, res);
 });
 
 routes.post('/users', isAuthenticated(), (req: Request, res: Response) => {

@@ -40,6 +40,8 @@ import { getAllUserBySectorController } from './application/usecases/getAllUserB
 import { getAllUserByOrganizationController } from './application/usecases/getAllUserByOrganization';
 import { updateUserController } from './application/usecases/updateUser';
 import { changeSectorUserController } from './application/usecases/changeSectorUser';
+import { deleteOrganizationSectorOnCascadeController } from './application/usecases/deleteOrganizationSectorOnCascade';
+import { deleteOrganizationController } from './application/usecases/deleteOrganization';
 import { getSectorsByOrganizationIdController } from './application/usecases/getSectorsByOrganizationId';
 import { updateManyUserController } from './application/usecases/updateManyUser';
 import { getUserByCollectionIdsController } from './application/usecases/getUserByCollectionIds';
@@ -114,6 +116,10 @@ routes.get('/organization', isAuthenticated(), (req: Request, res: Response) => 
 routes.get('/organizations', isAuthenticated(), (req: Request, res: Response) => {
     return getAllOrganizationController.handle(req, res);
 });
+
+routes.delete('/organizations', isAuthenticated(), (req: Request, res: Response) => {
+    return deleteOrganizationController.handle(req, res)
+})
 
 //routes Sectors
 
@@ -233,4 +239,10 @@ routes.put('/users/sector', isAuthenticated(), (req: Request, res: Response) => 
 
 routes.get('/users/organization', isAuthenticated(), (req: Request, res: Response) => {
     return getAllUserByOrganizationController.handle(req, res)
+})
+
+//routes Delete in cascade
+
+routes.delete('/sectors/cascade', isAuthenticated(), (req: Request, res: Response) => {
+    return deleteOrganizationSectorOnCascadeController.handle(req, res)
 })

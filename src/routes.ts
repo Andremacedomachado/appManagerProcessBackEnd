@@ -43,6 +43,7 @@ import { changeSectorUserController } from './application/usecases/changeSectorU
 import { getSectorsByOrganizationIdController } from './application/usecases/getSectorsByOrganizationId';
 import { updateManyUserController } from './application/usecases/updateManyUser';
 import { getUserByCollectionIdsController } from './application/usecases/getUserByCollectionIds';
+import { deleteOrganizationSectorController } from './application/usecases/deleteOrganizationSector';
 
 const routes = Router();
 
@@ -131,6 +132,10 @@ routes.get('/sector', isAuthenticated(), (req: Request, res: Response) => {
 routes.get('/sectors/byOrganization', isAuthenticated(), (req: Request, res: Response) => {
     return getSectorsByOrganizationIdController.handle(req, res);
 });
+
+routes.delete('/sectors', isAuthenticated(), (req: Request, res: Response) => {
+    return deleteOrganizationSectorController.handle(req, res)
+})
 
 //routes Activities
 

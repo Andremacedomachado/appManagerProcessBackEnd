@@ -143,6 +143,27 @@ export class PrismaOrganizationSectorRepository implements IOrganizationSectorRe
         return sectorsInMemory;
     }
 
+    async delete(organizationId: string): Promise<OrganizationSector | Error> {
+        const sectorExists = await this.findById(organizationId);
+        if (!sectorExists) {
+            return new Error(' Sector not Exist');
+        }
+        try {
+            const sectorDeleted = await prisma.organizationSector.delete({
+                where: {
+                    id: organizationId
+                }
+            })
+            return OrganizationSector.create({ employeesAllocated: sectorDeleted.employees_allocated, ...sectorDeleted }, sectorDeleted.id)
+        } catch (error) {
+            if (error instanceof Prisma.PrismaClientKnownRequestError) {
+                return error
+            }
+
+            return new Error('unexpected error')
+        }
+    }
+
     async findAllSectorByOrganization(organization_id: string): Promise<OrganizationSector[] | Error> {
         const sectorsInDatabase = await prisma.organizationSector.findMany({
             where: {

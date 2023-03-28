@@ -11,5 +11,6 @@ export interface IOrganizationSectorRepository {
     findAll(): Promise<OrganizationSector[] | null>,
     findManyByIds(organizationIds: string[]): Promise<OrganizationSector[] | null>,
     findSectorsByOrganizationId(organizationId: string): Promise<OrganizationSector[]>
+    delete(organizationId: string): Promise<OrganizationSector | Error>,
     findAllSectorByOrganization(organization_id: string): Promise<OrganizationSector[] | Error>
 }

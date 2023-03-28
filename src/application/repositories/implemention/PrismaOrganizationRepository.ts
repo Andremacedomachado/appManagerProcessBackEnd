@@ -117,4 +117,29 @@ export class PrismaOrganizationRepository implements IOrganizationRepository {
         return organizationsInMemory;
     }
 
+    async delete(organizationId: string): Promise<Organization | Error> {
+        try {
+            const organizationExists = await prisma.organization.findUnique({
+                where: {
+                    id: organizationId
+                }
+            })
+
+            if (!organizationExists) {
+                return new Error('Organization not exists')
+            }
+
+            const organizationDeleted = await prisma.organization.delete({
+                where: {
+                    id: organizationId
+                }
+            })
+
+            const { created_at, employees_allocated, name, updated_at, id } = organizationDeleted
+            return Organization.create({ created_at, employeesAllocated: employees_allocated, name, updated_at }, id);
+
+        } catch (error) {
+            return error as Error
+        }
+    }
 }

@@ -1,7 +1,7 @@
-import { IMessagaActivityRepository } from "../../repositories/IMessageActivityRepository";
+import { IMessageActivityRepository } from "../../repositories/IMessageActivityRepository";
 
 export class GetMessageByUserIdUseCase {
-    constructor(private messageActivityRepository: IMessagaActivityRepository) { }
+    constructor(private messageActivityRepository: IMessageActivityRepository) { }
 
     async execute(userId: string) {
         const collectionMessageActivityOrNull = await this.messageActivityRepository.findByUserId(userId);

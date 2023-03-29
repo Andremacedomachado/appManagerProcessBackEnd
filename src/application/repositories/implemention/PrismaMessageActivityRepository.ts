@@ -1,9 +1,9 @@
 import { TypeMessage } from "@prisma/client";
 import { prisma } from "../../../database";
 import { MessageActivity, TYPEMESSAGE } from "../../../domain/entities/MessageActivity";
-import { IMessagaActivityRepository, IMessageActivityUpdateProps, IRecordMessageIdProps } from "../IMessageActivityRepository";
+import { IMessageActivityRepository, IMessageActivityUpdateProps, IRecordMessageIdProps } from "../IMessageActivityRepository";
 
-export class PrismaMessageActivityRepository implements IMessagaActivityRepository {
+export class PrismaMessageActivityRepository implements IMessageActivityRepository {
     async save(recordMessage: MessageActivity): Promise<IRecordMessageIdProps | null> {
 
         const userExists = await prisma.user.findUnique({

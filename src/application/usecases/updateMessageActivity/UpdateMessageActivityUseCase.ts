@@ -1,8 +1,8 @@
-import { IMessagaActivityRepository } from "../../repositories/IMessageActivityRepository";
+import { IMessageActivityRepository } from "../../repositories/IMessageActivityRepository";
 import { IUpdateMessageActivityRequestDTO } from "./UpdateMessageActivityDTO";
 
 export class UpdateMessageActivityUseCase {
-    constructor(private messageActivityRepository: IMessagaActivityRepository) { }
+    constructor(private messageActivityRepository: IMessageActivityRepository) { }
 
     async execute(messageDataUpdates: IUpdateMessageActivityRequestDTO) {
         const { content, publication_date, type_message, activity_id, user_id, updated_at } = messageDataUpdates

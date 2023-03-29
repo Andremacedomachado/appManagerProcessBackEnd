@@ -1,9 +1,9 @@
 import { MessageActivity, TYPEMESSAGE } from "../../../domain/entities/MessageActivity";
-import { IMessagaActivityRepository } from "../../repositories/IMessageActivityRepository";
+import { IMessageActivityRepository } from "../../repositories/IMessageActivityRepository";
 import { ICreateMessageActivityRequestDTO } from "./CreateMessageActivtyDTO";
 
 export class CreateMessageActivityUseCase {
-    constructor(private messageActivityRepository: IMessagaActivityRepository) { }
+    constructor(private messageActivityRepository: IMessageActivityRepository) { }
 
     async execute(messageData: ICreateMessageActivityRequestDTO) {
         const messageActivityInMemory = MessageActivity.create({

@@ -1,7 +1,7 @@
-import { IMessagaActivityRepository, IRecordMessageIdProps } from "../../repositories/IMessageActivityRepository";
+import { IMessageActivityRepository, IRecordMessageIdProps } from "../../repositories/IMessageActivityRepository";
 
 export class DeleteMessageActivityUseCase {
-    constructor(private messageActivityRepository: IMessagaActivityRepository) { }
+    constructor(private messageActivityRepository: IMessageActivityRepository) { }
 
     async execute(messageId: IRecordMessageIdProps) {
         const messageDeletedOrNull = await this.messageActivityRepository.delete(messageId)

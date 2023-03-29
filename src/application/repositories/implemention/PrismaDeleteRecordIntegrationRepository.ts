@@ -6,7 +6,7 @@ import { IActivityRepository } from "../IActivityRepository";
 import { IAnnexActivityRepository } from "../IAnnexActivityRepository";
 import { ICollaboratorRepository } from "../ICollaboratorReposytory";
 import { IDeleteRecordIntegrationRepository, OrganizationDeletedDataReponseType, SectorDeletedDataReponseType, UserDeletedDataresponseType } from "../IDeleteRecordIntegrationRepository";
-import { IMessagaActivityRepository } from "../IMessageActivityRepository";
+import { IMessageActivityRepository } from "../IMessageActivityRepository";
 import { IOrganizationRepository } from "../IOrganizationRepository";
 import { IOrganizationSectorRepository } from "../IOrganizationSectorRepository";
 import { IRoleRepository } from "../IRoleRepository";
@@ -26,7 +26,7 @@ export class PrismaDeleteRecordInterationRepository implements IDeleteRecordInte
         private collaboratorRepository: ICollaboratorRepository,
         private activityRepository: IActivityRepository,
         private activityRelationRepository: IActivityRelationRepository,
-        private messagaActivityRepository: IMessagaActivityRepository,
+        private messageActivityRepository: IMessageActivityRepository,
         private annexActivityRepository: IAnnexActivityRepository,
     ) { }
     async deleteUserOnCascade(userid: string): Promise<UserDeletedDataresponseType | Error> {

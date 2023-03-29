@@ -15,7 +15,7 @@ export interface IRecordMessageIdProps {
     publication_date: Date,
 }
 
-export interface IMessagaActivityRepository {
+export interface IMessageActivityRepository {
     save(message: MessageActivity): Promise<IRecordMessageIdProps | null>,
     findAll(): Promise<MessageActivity[] | null>,
     findOne(messageId: IRecordMessageIdProps): Promise<MessageActivity | null>,

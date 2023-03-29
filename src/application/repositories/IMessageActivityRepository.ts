@@ -30,5 +30,6 @@ export interface IMessageActivityRepository {
     update(messageUpdate: IMessageActivityUpdateProps): Promise<MessageActivity | null>,
     delete(messageId: IRecordMessageIdProps): Promise<MessageActivity | null>,
     deleteCollectionRecordsByUserId(userId: string): Promise<MessageActivity[] | Error>,
+    deleteCollectionRecordsByActivityId(activityId: string): Promise<MessageActivity[] | Error>,
     deleteCollectionRecordsByUserIdAndActivityId(filter: IFilterMessageByUserActivityProps): Promise<MessageActivity[] | Error>,
 }

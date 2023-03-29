@@ -235,6 +235,28 @@ export class PrismaMessageActivityRepository implements IMessageActivityReposito
         }
     }
 
+    async deleteCollectionRecordsByActivityId(activity_id: string): Promise<MessageActivity[] | Error> {
+        try {
+            const [messagesDeleted, payloadDelete] = await prisma.$transaction([
+                prisma.messageAtivity.findMany({
+                    where: {
+                        activity_id
+                    }
+                }),
+                prisma.messageAtivity.deleteMany({
+                    where: {
+                        activity_id
+                    }
+                }),
+            ]);
+            if (messagesDeleted.length != payloadDelete.count) {
+                return new Error('Error in commit transaction - record not deleted')
+            }
+            return messagesDeleted.map(message => MessageActivity.create({ ...message, type_message: message.type_message as TYPEMESSAGE }));
+        } catch (error) {
+            return error as Error
+        }
+    }
     async deleteCollectionRecordsByUserIdAndActivityId(filter: IFilterMessageByUserActivityProps): Promise<MessageActivity[] | Error> {
         try {
             const [messagesDeleted, payloadDelete] = await prisma.$transaction([

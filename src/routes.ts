@@ -50,6 +50,7 @@ import { deleteOrganizationSectorController } from './application/usecases/delet
 import { deleteMessageActivityController } from './application/usecases/deleteMessageActivity';
 import { deleteAllMessageActivityByUserController } from './application/usecases/deleteAllMessageActivityByUser';
 import { deleteMessageActivityByUserInActivityController } from './application/usecases/deleteMessageAtivityByUserInActivity';
+import { deleteMessageActivityByActivityController } from './application/usecases/deleteMessageActivityByActivity';
 
 const routes = Router();
 
@@ -219,6 +220,10 @@ routes.delete('/messageActivity', isAuthenticated(), (req: Request, res: Respons
 
 routes.delete('/messageActivity/byUserId', isAuthenticated(), (req: Request, res: Response) => {
     return deleteAllMessageActivityByUserController.handle(req, res);
+});
+
+routes.delete('/messageActivity/byActivityId', isAuthenticated(), (req: Request, res: Response) => {
+    return deleteMessageActivityByActivityController.handle(req, res);
 });
 
 routes.delete('/messageActivity/byUserInActivitity', isAuthenticated(), (req: Request, res: Response) => {

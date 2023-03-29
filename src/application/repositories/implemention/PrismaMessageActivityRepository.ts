@@ -211,4 +211,27 @@ export class PrismaMessageActivityRepository implements IMessagaActivityReposito
         return MessageActivity.create({ ...messageDeleted, type_message: messageDeleted.type_message as TYPEMESSAGE })
     }
 
+    async deleteCollectionRecordsByUserId(user_id: string): Promise<MessageActivity[] | Error> {
+        try {
+
+            const [messagesDeleted, payloadDelete] = await prisma.$transaction([
+                prisma.messageAtivity.findMany({
+                    where: {
+                        user_id
+                    }
+                }),
+                prisma.messageAtivity.deleteMany({
+                    where: {
+                        user_id
+                    }
+                }),
+            ]);
+            if (messagesDeleted.length != payloadDelete.count) {
+                return new Error('Error in commit transaction - record not deleted')
+            }
+            return messagesDeleted.map(message => MessageActivity.create({ ...message, type_message: message.type_message as TYPEMESSAGE }));
+        } catch (error) {
+            return error as Error
+        }
+    }
 }

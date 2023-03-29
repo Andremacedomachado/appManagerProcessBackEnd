@@ -1,7 +1,7 @@
 import { TypeMessage } from "@prisma/client";
 import { prisma } from "../../../database";
 import { MessageActivity, TYPEMESSAGE } from "../../../domain/entities/MessageActivity";
-import { IMessageActivityRepository, IMessageActivityUpdateProps, IRecordMessageIdProps } from "../IMessageActivityRepository";
+import { IFilterMessageByUserActivityProps, IMessageActivityRepository, IMessageActivityUpdateProps, IRecordMessageIdProps } from "../IMessageActivityRepository";
 
 export class PrismaMessageActivityRepository implements IMessageActivityRepository {
     async save(recordMessage: MessageActivity): Promise<IRecordMessageIdProps | null> {
@@ -224,6 +224,25 @@ export class PrismaMessageActivityRepository implements IMessageActivityReposito
                     where: {
                         user_id
                     }
+                }),
+            ]);
+            if (messagesDeleted.length != payloadDelete.count) {
+                return new Error('Error in commit transaction - record not deleted')
+            }
+            return messagesDeleted.map(message => MessageActivity.create({ ...message, type_message: message.type_message as TYPEMESSAGE }));
+        } catch (error) {
+            return error as Error
+        }
+    }
+
+    async deleteCollectionRecordsByUserIdAndActivityId(filter: IFilterMessageByUserActivityProps): Promise<MessageActivity[] | Error> {
+        try {
+            const [messagesDeleted, payloadDelete] = await prisma.$transaction([
+                prisma.messageAtivity.findMany({
+                    where: filter
+                }),
+                prisma.messageAtivity.deleteMany({
+                    where: filter
                 }),
             ]);
             if (messagesDeleted.length != payloadDelete.count) {

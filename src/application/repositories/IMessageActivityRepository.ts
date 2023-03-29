@@ -15,6 +15,11 @@ export interface IRecordMessageIdProps {
     publication_date: Date,
 }
 
+export interface IFilterMessageByUserActivityProps {
+    activity_id: string,
+    user_id: string,
+}
+
 export interface IMessageActivityRepository {
     save(message: MessageActivity): Promise<IRecordMessageIdProps | null>,
     findAll(): Promise<MessageActivity[] | null>,
@@ -25,4 +30,5 @@ export interface IMessageActivityRepository {
     update(messageUpdate: IMessageActivityUpdateProps): Promise<MessageActivity | null>,
     delete(messageId: IRecordMessageIdProps): Promise<MessageActivity | null>,
     deleteCollectionRecordsByUserId(userId: string): Promise<MessageActivity[] | Error>,
+    deleteCollectionRecordsByUserIdAndActivityId(filter: IFilterMessageByUserActivityProps): Promise<MessageActivity[] | Error>,
 }

@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { ZodError } from "zod";
-import { DeleteAllAnnexActivtyByUserRequestSchema, DeleteAllAnnexActivtyByUserResponseSchema } from "./DeleteAllAnnexByUserDTO";
+import { DeleteAllAnnexActivityByUserRequestSchema, DeleteAllAnnexActivityByUserResponseSchema } from "./DeleteAllAnnexByUserDTO";
 import { DeleteAllAnnexActivtyByUserUseCase } from "./DeleteAllAnnexByUserUseCase";
 
 export class DeleteAllAnnexActivityByUserController {
@@ -8,13 +8,13 @@ export class DeleteAllAnnexActivityByUserController {
 
     async handle(request: Request, response: Response) {
         try {
-            const filter = DeleteAllAnnexActivtyByUserRequestSchema.parse(request.body);
+            const filter = DeleteAllAnnexActivityByUserRequestSchema.parse(request.body);
 
             const annexDeletedOrError = await this.deleteAllAnnexActivityByUserUseCase.execute(filter);
             if (annexDeletedOrError instanceof Error) {
                 return response.status(500).json({ error: annexDeletedOrError.message });
             }
-            const responseInFormat = DeleteAllAnnexActivtyByUserResponseSchema.parse(annexDeletedOrError)
+            const responseInFormat = DeleteAllAnnexActivityByUserResponseSchema.parse(annexDeletedOrError)
             return response.status(200).json(responseInFormat)
         } catch (errors) {
             if (errors instanceof ZodError) {

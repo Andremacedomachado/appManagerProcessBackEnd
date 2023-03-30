@@ -1,12 +1,12 @@
 import { z } from "zod";
 
-export const DeleteAllAnnexActivtyByUserRequestSchema = z.object({
+export const DeleteAllAnnexActivityByUserRequestSchema = z.object({
     user_id: z.string().uuid(),
 
 })
-export type DeleteAllAnnexActivtyByUserRequestDTO = z.infer<typeof DeleteAllAnnexActivtyByUserRequestSchema>
+export type DeleteAllAnnexActivityByUserRequestDTO = z.infer<typeof DeleteAllAnnexActivityByUserRequestSchema>
 
-export const AnnexActivtyByUserResponseSchema = z.object({
+export const AnnexActivityByUserResponseSchema = z.object({
     original_name: z.string(),
     file_name: z.string(),
     user_id: z.string().uuid(),
@@ -15,6 +15,6 @@ export const AnnexActivtyByUserResponseSchema = z.object({
     publication_date: z.date()
 })
 
-export type AnnexActivtyByUserResponseDTO = z.input<typeof AnnexActivtyByUserResponseSchema>
+export type AnnexActivityByUserResponseDTO = z.input<typeof AnnexActivityByUserResponseSchema>
 
-export const DeleteAllAnnexActivtyByUserResponseSchema = z.array(AnnexActivtyByUserResponseSchema);
+export const DeleteAllAnnexActivityByUserResponseSchema = z.array(AnnexActivityByUserResponseSchema);

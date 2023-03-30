@@ -219,10 +219,9 @@ export class PrismaCollaboratorRepository implements ICollaboratorRepository {
                     where: filter
                 });
 
-                const payloadDelete = await tx.annex.deleteMany({
+                const payloadDelete = await tx.collaborators.deleteMany({
                     where: filter
                 });
-
                 return collaboratorsFound
             })
 

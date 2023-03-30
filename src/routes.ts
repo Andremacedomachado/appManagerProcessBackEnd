@@ -55,6 +55,7 @@ import { deleteAllAnnexActivityByUserController } from './application/usecases/d
 import { deleteAllAnnexActivityByActivityController } from './application/usecases/deleteAllAnnexActivityByActivity';
 import { deleteCollaboratorController } from './application/usecases/deleteCollaborator';
 import { deleteAllCollboratorByUserController } from './application/usecases/deleteAllCollaboratorByUser';
+import { deleteAllCollboratorByActivityController } from './application/usecases/deleteAllCollaboratorByActivity';
 
 const routes = Router();
 
@@ -202,6 +203,10 @@ routes.delete('/collaborators', isAuthenticated(), (req: Request, res: Response)
 
 routes.delete('/collaborators/byUser', isAuthenticated(), (req: Request, res: Response) => {
     return deleteAllCollboratorByUserController.handle(req, res);
+})
+
+routes.delete('/collaborators/byActivity', isAuthenticated(), (req: Request, res: Response) => {
+    return deleteAllCollboratorByActivityController.handle(req, res);
 })
 
 

@@ -52,6 +52,7 @@ import { deleteAllMessageActivityByUserController } from './application/usecases
 import { deleteMessageActivityByUserInActivityController } from './application/usecases/deleteMessageAtivityByUserInActivity';
 import { deleteMessageActivityByActivityController } from './application/usecases/deleteMessageActivityByActivity';
 import { deleteAllAnnexActivityByUserController } from './application/usecases/deleteAllAnnexByUser';
+import { deleteAllAnnexActivityByActivityController } from './application/usecases/deleteAllAnnexActivityByActivity';
 
 const routes = Router();
 
@@ -251,6 +252,10 @@ routes.delete('/annexActivity', isAuthenticated(), (req: Request, res: Response)
 
 routes.delete('/annexActivity/allByUser', isAuthenticated(), (req: Request, res: Response) => {
     return deleteAllAnnexActivityByUserController.handle(req, res)
+})
+
+routes.delete('/annexActivity/allByActivity', isAuthenticated(), (req: Request, res: Response) => {
+    return deleteAllAnnexActivityByActivityController.handle(req, res)
 })
 
 //routes UserIntegration

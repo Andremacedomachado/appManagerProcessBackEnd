@@ -7,4 +7,5 @@ export interface ICollaboratorRepository {
     findByUserId(userId: string): Promise<RecordCollaborator[] | null>
     findByActivityId(activityId: string): Promise<RecordCollaborator[] | null>
     findAll(): Promise<RecordCollaborator[] | null>
+    delete(recordCollaborator: IRecordCollaboratorProps): Promise<RecordCollaborator | Error>
 }

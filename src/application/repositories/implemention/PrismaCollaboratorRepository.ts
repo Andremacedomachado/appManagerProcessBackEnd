@@ -1,6 +1,7 @@
 import { prisma } from "../../../database";
 import { IRecordCollaboratorProps, RecordCollaborator } from "../../../domain/entities/RecordCollaborator";
 import { ICollaboratorRepository } from "../ICollaboratorReposytory";
+import { Prisma } from "@prisma/client"
 
 export class PrismaCollaboratorRepository implements ICollaboratorRepository {
     async save(userIds: string[], activityId: string): Promise<Error | null> {
@@ -184,6 +185,26 @@ export class PrismaCollaboratorRepository implements ICollaboratorRepository {
             return null
         }
         return recordsExists
+    }
+
+    async delete(recordCollaborator: IRecordCollaboratorProps): Promise<RecordCollaborator | Error> {
+        try {
+
+            const recordDeleted = await prisma.collaborators.delete({
+                where: {
+                    user_id_activity_id: recordCollaborator
+                }
+            });
+
+            return RecordCollaborator.create({ ...recordCollaborator });
+        } catch (error) {
+            if (error instanceof Prisma.PrismaClientKnownRequestError) {
+                if (error.code == "P2025") {
+                    return new Error("Record not exist")
+                }
+            }
+            return error as Error
+        }
     }
 
 }

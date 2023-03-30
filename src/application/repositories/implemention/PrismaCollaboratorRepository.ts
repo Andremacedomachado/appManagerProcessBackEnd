@@ -1,6 +1,6 @@
 import { prisma } from "../../../database";
 import { IRecordCollaboratorProps, RecordCollaborator } from "../../../domain/entities/RecordCollaborator";
-import { ICollaboratorRepository } from "../ICollaboratorReposytory";
+import { ICollaboratorRepository, IFilterCollaboratorProps } from "../ICollaboratorReposytory";
 import { Prisma } from "@prisma/client"
 
 export class PrismaCollaboratorRepository implements ICollaboratorRepository {
@@ -204,6 +204,31 @@ export class PrismaCollaboratorRepository implements ICollaboratorRepository {
                 }
             }
             return error as Error
+        }
+    }
+
+    async deleteMany(filter: IFilterCollaboratorProps): Promise<RecordCollaborator[] | Error> {
+        try {
+            const filterValid = Object.values(filter).every(field => field !== undefined);
+            if (!filterValid) {
+                throw new Error('Filter invalid - please inform at least one field with value')
+            }
+
+            const collaboratorInDelete = await prisma.$transaction(async (tx) => {
+                const collaboratorsFound = await tx.collaborators.findMany({
+                    where: filter
+                });
+
+                const payloadDelete = await tx.annex.deleteMany({
+                    where: filter
+                });
+
+                return collaboratorsFound
+            })
+
+            return collaboratorInDelete.map(collaborator => RecordCollaborator.create({ ...collaborator }))
+        } catch (errors) {
+            return errors as Error
         }
     }
 

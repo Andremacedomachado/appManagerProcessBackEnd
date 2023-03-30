@@ -51,6 +51,7 @@ import { deleteMessageActivityController } from './application/usecases/deleteMe
 import { deleteAllMessageActivityByUserController } from './application/usecases/deleteAllMessageActivityByUser';
 import { deleteMessageActivityByUserInActivityController } from './application/usecases/deleteMessageAtivityByUserInActivity';
 import { deleteMessageActivityByActivityController } from './application/usecases/deleteMessageActivityByActivity';
+import { deleteAllAnnexActivityByUserController } from './application/usecases/deleteAllAnnexByUser';
 
 const routes = Router();
 
@@ -246,6 +247,10 @@ routes.get('/annexActivity/file', isAuthenticated(), (req: Request, res: Respons
 
 routes.delete('/annexActivity', isAuthenticated(), (req: Request, res: Response) => {
     return deleteAnnexActivityController.handle(req, res)
+})
+
+routes.delete('/annexActivity/allByUser', isAuthenticated(), (req: Request, res: Response) => {
+    return deleteAllAnnexActivityByUserController.handle(req, res)
 })
 
 //routes UserIntegration

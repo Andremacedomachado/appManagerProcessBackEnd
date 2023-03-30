@@ -1,11 +1,14 @@
 import { prisma } from "../../../database";
 import { AnnexActivity } from "../../../domain/entities/AnnexActivity";
-import { IAnnexActivityIdProps, IAnnexActivityRepository, IAnnexActivityUnique } from "../IAnnexActivityRepository";
+import { IAnnexActivityIdProps, IAnnexActivityRepository, IAnnexActivityUnique, IFilterAnnexActivityProps } from "../IAnnexActivityRepository";
+
+import path from 'path';
+import fs from 'fs';
+import { Annex } from "@prisma/client";
 
 export class PrismaAnnexActivityRepository implements IAnnexActivityRepository {
     async save(annexAtivity: AnnexActivity): Promise<IAnnexActivityIdProps | null> {
         const { file_name, original_name, activity_id, publication_date, url, user_id } = annexAtivity;
-
         const activityExists = await prisma.activity.findUnique({
             where: {
                 id: activity_id
@@ -177,5 +180,50 @@ export class PrismaAnnexActivityRepository implements IAnnexActivityRepository {
             activity_id,
             user_id
         });
+    }
+
+    async deleteRecordsByfilter(filter: IFilterAnnexActivityProps): Promise<AnnexActivity[] | Error> {
+        try {
+            const deleteFileInLocalStorage = async (annexs: Annex[]) => {
+                var countFileDeleted = 0;
+                for (const annex of annexs) {
+                    const pathFile = path.resolve(__dirname, '../../../../uploads', `${annex.file_name}`);
+                    if (fs.existsSync(pathFile)) {
+                        fs.rm(pathFile, (err) => {
+                            if (err) {
+                                throw err
+                            }
+                        });
+                        countFileDeleted++;
+                    }
+                }
+                return countFileDeleted
+            }
+            const filterValid = Object.values(filter).every(field => field !== undefined);
+            if (!filterValid) {
+                throw new Error('Filter invalid - please inform at least one field with value')
+            }
+
+            const annexInDelete = await prisma.$transaction(async (tx) => {
+                const annexsFound = await tx.annex.findMany({
+                    where: filter
+                });
+
+                const payloadDelete = await tx.annex.deleteMany({
+                    where: filter
+                });
+                const fileDeleted = await deleteFileInLocalStorage(annexsFound);
+
+                if (fileDeleted != payloadDelete.count) {
+                    throw Error('Error In trasaction - annex not deleted')
+                }
+
+                return annexsFound
+            })
+
+            return annexInDelete.map(annex => AnnexActivity.create({ ...annex }))
+        } catch (errors) {
+            return errors as Error
+        }
     }
 }

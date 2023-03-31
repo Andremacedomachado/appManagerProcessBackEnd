@@ -1,3 +1,4 @@
+import { Prisma } from "@prisma/client";
 import { prisma } from "../../../database";
 import { RecordDependency } from "../../../domain/entities/RecordDependency";
 import { IActivityRelationRepository, IRecordDependecyIdProps } from "../IActivityRelationRepository";
@@ -65,19 +66,26 @@ export class PrismaActivityRelationRepository implements IActivityRelationReposi
         return collectionActivityRelations.map(recordInDatabase => RecordDependency.create(recordInDatabase))
 
     }
-    async delete(recordDependency: RecordDependency): Promise<RecordDependency | null> {
-        const recordDeletedInDatabase = await prisma.activityRelationship.delete({
-            where: {
-                parent_id_children_id: {
-                    parent_id: recordDependency.parent_id,
-                    children_id: recordDependency.children_id
-                }
-            }
-        })
-        const recordInMemory = RecordDependency.create(recordDeletedInDatabase);
 
-        return recordInMemory;
+    async delete(recordId: IRecordDependecyIdProps): Promise<RecordDependency | Error> {
+        try {
+            const recordDeletedInDatabase = await prisma.activityRelationship.delete({
+                where: {
+                    parent_id_children_id: recordId
+                }
+            })
+            const recordInMemory = RecordDependency.create(recordDeletedInDatabase);
+
+            return recordInMemory;
+        } catch (error) {
+            if (error instanceof Prisma.PrismaClientKnownRequestError && error.code == "P2025") {
+                return new Error("Record to delete does not exist");
+            }
+
+            return error as Error;
+        }
     }
+
     async deleteByCorrelationId(searchId: string): Promise<RecordDependency[] | Error> {
         try {
 

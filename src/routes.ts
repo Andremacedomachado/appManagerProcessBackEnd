@@ -59,6 +59,7 @@ import { deleteAllCollboratorByActivityController } from './application/usecases
 import { deleteActivityController } from './application/usecases/deleteActivity';
 import { createRecordDependencyController } from './application/usecases/createRecordDependency';
 import { deleteRecordDependencyByCorrelationController } from './application/usecases/deleteRecordDependencyByCorrelation';
+import { deleteRecordDependencyController } from './application/usecases/deleteRecordDependency';
 
 const routes = Router();
 
@@ -194,6 +195,10 @@ routes.delete('/activity', isAuthenticated(), (req: Request, res: Response) => {
 
 routes.post('/recordDependency', isAuthenticated(), (req: Request, res: Response) => {
     return createRecordDependencyController.handle(req, res);
+})
+
+routes.delete('/recordDependency', isAuthenticated(), (req: Request, res: Response) => {
+    return deleteRecordDependencyController.handle(req, res);
 })
 
 routes.delete('/recordDependency/byCorrelation', isAuthenticated(), (req: Request, res: Response) => {

@@ -6,7 +6,7 @@ export interface IRecordDependecyIdProps {
 }
 
 export interface IActivityRelationRepository {
-    save(recordDependency: RecordDependency): Promise<IRecordDependecyIdProps | null>,
+    save(recordDependency: RecordDependency): Promise<RecordDependency | null>,
     findByParentId(parent_id: string): Promise<RecordDependency[] | null>,
     findByChildrenId(children_id: string): Promise<RecordDependency[] | null>,
     delete(recordDependency: RecordDependency): Promise<RecordDependency | null>,

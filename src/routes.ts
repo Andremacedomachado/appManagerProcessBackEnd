@@ -57,6 +57,7 @@ import { deleteCollaboratorController } from './application/usecases/deleteColla
 import { deleteAllCollboratorByUserController } from './application/usecases/deleteAllCollaboratorByUser';
 import { deleteAllCollboratorByActivityController } from './application/usecases/deleteAllCollaboratorByActivity';
 import { deleteActivityController } from './application/usecases/deleteActivity';
+import { createRecordDependencyController } from './application/usecases/createRecordDependency';
 
 const routes = Router();
 
@@ -186,6 +187,12 @@ routes.post('/changeActivityTreeProcessStatus', isAuthenticated(), (req: Request
 
 routes.delete('/activity', isAuthenticated(), (req: Request, res: Response) => {
     return deleteActivityController.handle(req, res);
+})
+
+//routes RecordDependecy
+
+routes.post('/recordDependency', isAuthenticated(), (req: Request, res: Response) => {
+    return createRecordDependencyController.handle(req, res);
 })
 
 //routes Collaborators

@@ -4,14 +4,14 @@ import { IActivityRelationRepository, IRecordDependecyIdProps } from "../IActivi
 
 export class PrismaActivityRelationRepository implements IActivityRelationRepository {
     async save(recordDependency: RecordDependency): Promise<IRecordDependecyIdProps | null> {
-        const recordId = { parent_id: recordDependency.parent_id, children_id: recordDependency.parent_id } as IRecordDependecyIdProps
+        const recordId = { parent_id: recordDependency.parent_id, children_id: recordDependency.children_id } as IRecordDependecyIdProps
         const activityRelationExists = await prisma.activityRelationship.findUnique({
             where: {
                 parent_id_children_id: recordId
             }
         })
 
-        if (!activityRelationExists) {
+        if (activityRelationExists) {
             return null
         }
 
@@ -25,7 +25,7 @@ export class PrismaActivityRelationRepository implements IActivityRelationReposi
             }
         });
 
-        return recordId;
+        return RecordDependency.create(recordRelationInDatabase);
     }
     async findByParentId(parent_id: string): Promise<RecordDependency[] | null> {
         const activityExists = await prisma.activity.findUnique({

@@ -78,39 +78,36 @@ export class PrismaActivityRelationRepository implements IActivityRelationReposi
 
         return recordInMemory;
     }
-    async deleteByCorrelationId(searchId: string): Promise<Error | null | number> {
-        const activityExists = await prisma.activity.findUnique({
-            where: {
-                id: searchId
-            }
-        })
+    async deleteByCorrelationId(searchId: string): Promise<RecordDependency[] | Error> {
+        try {
 
-        if (!activityExists) {
-            return null;
-        }
-        const [quantityFoundRecord, deletePayload] = await prisma.$transaction([
-            prisma.activityRelationship.count({
-                where: {
-                    OR: {
-                        parent_id: searchId,
-                        children_id: searchId,
+            const recordRelationDeleted = await prisma.$transaction(async (tx) => {
+                const dependencyCorrelation = await tx.activityRelationship.findMany({
+                    where: {
+                        OR: [
+                            { parent_id: searchId },
+                            { children_id: searchId },
+                        ]
                     }
-                }
-            }),
-            prisma.activityRelationship.deleteMany({
-                where: {
-                    OR: {
-                        parent_id: searchId,
-                        children_id: searchId,
-                    }
-                }
-            })
-        ]);
+                });
 
-        if (quantityFoundRecord != deletePayload.count) {
-            return new Error('Error trasaction operation - records not deleted')
+                const payloadDeleted = await tx.activityRelationship.deleteMany({
+                    where: {
+                        OR: [
+                            { parent_id: searchId },
+                            { children_id: searchId },
+                        ]
+                    }
+                })
+
+                return dependencyCorrelation;
+            });
+
+
+            return recordRelationDeleted.map(relation => RecordDependency.create({ ...relation }));
+        } catch (error) {
+            return error as Error
         }
-        return deletePayload.count;
     }
 
 }

@@ -1,4 +1,4 @@
-import { NodeTypeActivity, ProgressStatusActivity } from '@prisma/client';
+import { NodeTypeActivity, Prisma, ProgressStatusActivity } from '@prisma/client';
 import { prisma } from '../../../database';
 import { IActivityProps, Activity, TYPENODE, STATUSACTIVITY } from '../../../domain/entities/Activity';
 import { IActivityId, IActivityRepository, IActivityUniqueContentProps, IActivityUpdateProps } from '../IActivityRepository'
@@ -171,5 +171,35 @@ export class PrismaActivityRepository implements IActivityRepository {
         return activityUpdatedInMemory;
     }
 
+    async delete(activityId: string): Promise<Activity | Error> {
+        try {
+            const activityDeleted = await prisma.activity.delete({
+                where: {
+                    id: activityId
+                }
+            })
+
+            const { id, title, description, created_at, updated_at, responsible_id, due_date, start_date, progress_status, type_node } = activityDeleted
+            const activityDeletedInMemory = Activity.create({
+                title,
+                description: !description ? undefined : description,
+                created_at,
+                updated_at,
+                responsible_id,
+                due_date: !due_date ? undefined : due_date,
+                start_date: !start_date ? undefined : start_date,
+                progress_status: progress_status as STATUSACTIVITY,
+                type_node: type_node as TYPENODE
+            }, id);
+
+            return activityDeletedInMemory
+        } catch (error) {
+            if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2003") {
+                return new Error('Operation invalid -  exists one or more records correlation with activity');
+
+            }
+            return error as Error
+        }
+    }
 
 }

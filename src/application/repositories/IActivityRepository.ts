@@ -18,4 +18,5 @@ export interface IActivityRepository {
     findByTitle(titleSearch: string): Promise<Activity | null>,
     findUniqueForcontent(dataSearch: IActivityUniqueContentProps): Promise<Activity | null>,
     update(activity: IActivityProps): Promise<Activity | null>,
+    delete(activityId: string): Promise<Activity | Error>,
 }

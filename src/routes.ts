@@ -56,6 +56,7 @@ import { deleteAllAnnexActivityByActivityController } from './application/usecas
 import { deleteCollaboratorController } from './application/usecases/deleteCollaborator';
 import { deleteAllCollboratorByUserController } from './application/usecases/deleteAllCollaboratorByUser';
 import { deleteAllCollboratorByActivityController } from './application/usecases/deleteAllCollaboratorByActivity';
+import { deleteActivityController } from './application/usecases/deleteActivity';
 
 const routes = Router();
 
@@ -181,6 +182,10 @@ routes.get('/collectionActivityTree', isAuthenticated(), (req: Request, res: Res
 
 routes.post('/changeActivityTreeProcessStatus', isAuthenticated(), (req: Request, res: Response) => {
     return changeActivityTreeProcessStatusController.handle(req, res);
+})
+
+routes.delete('/activity', isAuthenticated(), (req: Request, res: Response) => {
+    return deleteActivityController.handle(req, res);
 })
 
 //routes Collaborators

@@ -127,8 +127,8 @@ model ActivityRelationship {
     parent_id            String
     children_id          String
     dependency_link_date DateTime? @default(now())
-    ParentActivity       Activity  @relation(fields: [parent_id], references: [id], name: "FK_parent_dependece")
-    ChildrenActivity     Activity  @relation(fields: [children_id], references: [id], name: "Fk_children_dependece")
+    ParentActivity       Activity  @relation(fields: [parent_id], references: [id], name: "FK_parent_dependece", onDelete: Cascade)
+    ChildrenActivity     Activity  @relation(fields: [children_id], references: [id], name: "Fk_children_dependece", onDelete: Cascade)
 
     @@id([parent_id, children_id])
     @@map("activityRelationship")
@@ -145,9 +145,9 @@ enum NodeTypeActivity {
 }
 
 model Collaborators {
-    user        User     @relation(fields: [user_id], references: [id])
+    user        User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
     user_id     String
-    activity    Activity @relation(fields: [activity_id], references: [id])
+    activity    Activity @relation(fields: [activity_id], references: [id], onDelete: Cascade)
     activity_id String
 
     @@id([user_id, activity_id])
@@ -160,9 +160,9 @@ model Annex {
     file_name        String   @unique
     url              String
 
-    CorrelationActivity Activity @relation(fields: [activity_id], references: [id])
+    CorrelationActivity Activity @relation(fields: [activity_id], references: [id], onDelete: Cascade)
     activity_id         String
-    Publisher           User     @relation(fields: [user_id], references: [id])
+    Publisher           User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
     user_id             String
 
     @@id([activity_id, user_id, publication_date])
@@ -175,9 +175,9 @@ model MessageAtivity {
     updated_at       DateTime    @default(now())
     type_message     TypeMessage
 
-    CorrelationActivity Activity @relation(fields: [activity_id], references: [id])
+    CorrelationActivity Activity @relation(fields: [activity_id], references: [id], onDelete: Cascade)
     activity_id         String
-    Publisher           User     @relation(fields: [user_id], references: [id])
+    Publisher           User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
     user_id             String
 
     @@id([activity_id, user_id, publication_date])

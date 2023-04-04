@@ -1,11 +1,16 @@
 import { prisma } from "../../../database";
+import { Activity, STATUSACTIVITY, TYPENODE } from "../../../domain/entities/Activity";
+import { AnnexActivity } from "../../../domain/entities/AnnexActivity";
+import { MessageActivity, TYPEMESSAGE } from "../../../domain/entities/MessageActivity";
 import { Organization } from "../../../domain/entities/Organization";
+import { RecordCollaborator } from "../../../domain/entities/RecordCollaborator";
+import { RecordDependency } from "../../../domain/entities/RecordDependency";
 import { User } from "../../../domain/entities/User";
 import { IActivityRelationRepository } from "../IActivityRelationRepository";
 import { IActivityRepository } from "../IActivityRepository";
 import { IAnnexActivityRepository } from "../IAnnexActivityRepository";
 import { ICollaboratorRepository } from "../ICollaboratorReposytory";
-import { IDeleteRecordIntegrationRepository, OrganizationDeletedDataReponseType, SectorDeletedDataReponseType, UserDeletedDataresponseType } from "../IDeleteRecordIntegrationRepository";
+import { ActivityDeletedDataResponseType, IDeleteRecordIntegrationRepository, OrganizationDeletedDataReponseType, SectorDeletedDataReponseType, UserDeletedDataresponseType } from "../IDeleteRecordIntegrationRepository";
 import { IMessageActivityRepository } from "../IMessageActivityRepository";
 import { IOrganizationRepository } from "../IOrganizationRepository";
 import { IOrganizationSectorRepository } from "../IOrganizationSectorRepository";
@@ -115,4 +120,91 @@ export class PrismaDeleteRecordInterationRepository implements IDeleteRecordInte
         return promiseAllExcute
     }
 
+    async deleteActivityOnCascade(activityId: string): Promise<ActivityDeletedDataResponseType | Error> {
+        try {
+            const activityDeletedRecords = await prisma.$transaction(async (tx) => {
+
+                const activityData = await tx.activity.delete({
+                    where: {
+                        id: activityId
+                    },
+                    select: {
+                        id: true,
+                        title: true,
+                        description: true,
+                        due_date: true,
+                        start_date: true,
+                        created_at: true,
+                        progress_status: true,
+                        responsible_id: true,
+                        type_node: true,
+                        updated_at: true,
+                        Annex: true,
+                        Collaborators: true,
+                        ChildrenRelationship: true,
+                        ParentRelationship: true,
+                        MessageAtivity: true,
+                    }
+                });
+                const { id, ChildrenRelationship, ParentRelationship, Annex, Collaborators, MessageAtivity, due_date, description, start_date, ...props } = activityData
+                const registerDeleted = {
+                    infoActivity: Activity.create({
+                        ...props,
+                        description: description ?? undefined,
+                        due_date: due_date ?? undefined,
+                        start_date: start_date ?? undefined,
+                        type_node: props.type_node as TYPENODE,
+                        progress_status: props.progress_status as STATUSACTIVITY
+                    }, id),
+                    collaborators: Collaborators.map(record => RecordCollaborator.create(record)),
+                    dependencies: [
+                        ...ChildrenRelationship.map(record => RecordDependency.create(record)),
+                        ...ParentRelationship.map(record => RecordDependency.create(record))
+                    ],
+                    annexsInActivity: Annex.map(record => AnnexActivity.create(record)),
+                    messagesInActivity: MessageAtivity.map(record => MessageActivity.create({
+                        ...record,
+                        type_message: record.type_message as TYPEMESSAGE
+                    }))
+                } as ActivityDeletedDataResponseType;
+
+                return registerDeleted;
+            })
+
+            return activityDeletedRecords
+        } catch (error) {
+            return error as Error
+        }
+    }
+
+    /* async deleteActivityOnCascadeWithRepositories(activityId: string): Promise<ActivityDeletedDataResponseType | Error> {
+    // Not work... because prisma not support nested trasactions
+    // possible resolve, implements Proxy for pass reference of the transaction (tx) 
+        try {
+            const activityDeletedRecords = await prisma.$transaction(async (tx) => {
+                const collaborators = await this.collaboratorRepository.deleteMany({ activity_id: activityId });
+                const dependencies = await this.activityRelationRepository.deleteByCorrelationId(activityId);
+                const messagesInActivity = await this.messageActivityRepository.deleteCollectionRecordsByActivityId(activityId);
+                const annexsInActivity = await this.annexActivityRepository.deleteRecordsByfilter({ activity_id: activityId });
+                if (annexsInActivity instanceof Error) {
+                    throw annexsInActivity
+                }
+
+                const infoActivity = await this.activityRepository.delete(activityId);
+                const registerDeleted = {
+                    infoActivity,
+                    collaborators,
+                    dependencies,
+                    annexsInActivity,
+                    messagesInActivity
+                } as ActivityDeletedDataResponseType;
+
+                return registerDeleted;
+            })
+
+            return activityDeletedRecords
+        } catch (error) {
+            return error as Error
+        }
+    } */
 }

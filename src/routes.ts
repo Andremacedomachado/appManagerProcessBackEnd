@@ -60,6 +60,7 @@ import { deleteActivityController } from './application/usecases/deleteActivity'
 import { createRecordDependencyController } from './application/usecases/createRecordDependency';
 import { deleteRecordDependencyByCorrelationController } from './application/usecases/deleteRecordDependencyByCorrelation';
 import { deleteRecordDependencyController } from './application/usecases/deleteRecordDependency';
+import { deleteActivityOnCascadeController } from './application/usecases/deleteActivityOnCascade';
 
 const routes = Router();
 
@@ -318,4 +319,8 @@ routes.delete('/organizations/cascade', isAuthenticated(), (req: Request, res: R
 
 routes.delete('/sectors/cascade', isAuthenticated(), (req: Request, res: Response) => {
     return deleteOrganizationSectorOnCascadeController.handle(req, res)
+})
+
+routes.delete('/activity/cascade', isAuthenticated(), (req: Request, res: Response) => {
+    return deleteActivityOnCascadeController.handle(req, res)
 })

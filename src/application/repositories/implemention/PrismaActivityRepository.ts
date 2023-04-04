@@ -173,26 +173,49 @@ export class PrismaActivityRepository implements IActivityRepository {
 
     async delete(activityId: string): Promise<Activity | Error> {
         try {
-            const activityDeleted = await prisma.activity.delete({
-                where: {
-                    id: activityId
+            const activityInMemory = await prisma.$transaction(async tx => {
+                const activityData = await prisma.activity.delete({
+                    where: {
+                        id: activityId
+                    },
+                    select: {
+                        id: true,
+                        title: true,
+                        description: true,
+                        due_date: true,
+                        start_date: true,
+                        created_at: true,
+                        progress_status: true,
+                        responsible_id: true,
+                        type_node: true,
+                        updated_at: true,
+                        Annex: true,
+                        Collaborators: true,
+                        ChildrenRelationship: true,
+                        ParentRelationship: true,
+                        MessageAtivity: true,
+                    }
+                });
+
+                const { id, title, description, created_at, updated_at, responsible_id, due_date, start_date, progress_status, type_node, Annex, ChildrenRelationship, Collaborators, MessageAtivity, ParentRelationship } = activityData;
+                if ((Annex.length != 0) || (Collaborators.length != 0) || (MessageAtivity.length != 0) || (ParentRelationship.length != 0) || (ChildrenRelationship.length != 0)) {
+                    throw new Error("Operation invalid -  exists one or more records correlation with activityRecord Activity exits Records Dependent")
                 }
+                const activityDeletedInMemory = Activity.create({
+                    title,
+                    description: !description ? undefined : description,
+                    created_at,
+                    updated_at,
+                    responsible_id,
+                    due_date: !due_date ? undefined : due_date,
+                    start_date: !start_date ? undefined : start_date,
+                    progress_status: progress_status as STATUSACTIVITY,
+                    type_node: type_node as TYPENODE
+                }, id);
+                return activityDeletedInMemory
             })
 
-            const { id, title, description, created_at, updated_at, responsible_id, due_date, start_date, progress_status, type_node } = activityDeleted
-            const activityDeletedInMemory = Activity.create({
-                title,
-                description: !description ? undefined : description,
-                created_at,
-                updated_at,
-                responsible_id,
-                due_date: !due_date ? undefined : due_date,
-                start_date: !start_date ? undefined : start_date,
-                progress_status: progress_status as STATUSACTIVITY,
-                type_node: type_node as TYPENODE
-            }, id);
-
-            return activityDeletedInMemory
+            return activityInMemory
         } catch (error) {
             if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2003") {
                 return new Error('Operation invalid -  exists one or more records correlation with activity');

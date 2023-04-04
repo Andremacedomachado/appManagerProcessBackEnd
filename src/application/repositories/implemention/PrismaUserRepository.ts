@@ -197,4 +197,46 @@ export class PrismaUserRepository implements IUserRepository {
             return User.create({ created_at, email, name, organization_sector_id, password, status: <UserIsActive>status, updated_at }, id)
         })
     }
+
+    async delete(userId: string): Promise<User | Error> {
+        try {
+            const userDeleted = await prisma.$transaction(async tx => {
+                const user = await tx.user.delete({
+                    where: {
+                        id: userId
+                    },
+                    select: {
+                        id: true,
+                        name: true,
+                        email: true,
+                        password: true,
+                        created_at: true,
+                        status: true,
+                        organization_sector_id: true,
+                        updated_at: true,
+                        registerAdjuster: true,
+                        registerRole: true,
+                        linked_sector: true,
+                        Annex: true,
+                        Collaborators: true,
+                        MessageAtivity: true,
+                        ActivitiesResponsible: true
+                    }
+                })
+                var recordDenpendet = false;
+                Object.values(user).forEach((propsWithRelation) => {
+                    if (Array.isArray(propsWithRelation) && (propsWithRelation.length != 0)) {
+                        recordDenpendet = true;
+                    }
+                })
+                if (recordDenpendet) {
+                    throw new Error('Record user with correlation record Dependent - oparation invalid')
+                }
+                return user
+            })
+            return User.create({ ...userDeleted, status: userDeleted.status as UserIsActive }, userDeleted.id);
+        } catch (error) {
+            return error as Error
+        }
+    }
 }

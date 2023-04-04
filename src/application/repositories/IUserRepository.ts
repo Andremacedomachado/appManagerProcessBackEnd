@@ -25,7 +25,6 @@ export type IUserUpdateManyProps = {
     updated_at?: Date,
     organization_sector_id?: string | null,
 }
-
 export interface IUserRepository {
     save(user: User): Promise<UserId | null>
     findById(id: string): Promise<User | null>
@@ -35,4 +34,5 @@ export interface IUserRepository {
     getManyBySector(sectorId: string): Promise<User[]>
     updatedMany(dataChangeMany: IUserUpdateManyProps): Promise<User[]>
     findManyByCollenctionIds(userIds: string[]): Promise<User[]>
+    delete(userId: string): Promise<User | Error>
 }

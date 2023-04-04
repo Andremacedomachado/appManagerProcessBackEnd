@@ -61,6 +61,7 @@ import { createRecordDependencyController } from './application/usecases/createR
 import { deleteRecordDependencyByCorrelationController } from './application/usecases/deleteRecordDependencyByCorrelation';
 import { deleteRecordDependencyController } from './application/usecases/deleteRecordDependency';
 import { deleteActivityOnCascadeController } from './application/usecases/deleteActivityOnCascade';
+import { deleteUserController } from './application/usecases/deleteUser';
 
 const routes = Router();
 
@@ -104,6 +105,11 @@ routes.put('/users', isAuthenticated(), (req: Request, res: Response) => {
 routes.put('/users/many', isAuthenticated(), (req: Request, res: Response) => {
     return updateManyUserController.handle(req, res);
 });
+
+routes.delete('/users', isAuthenticated(), (req: Request, res: Response) => {
+    return deleteUserController.handle(req, res);
+});
+
 //routes login
 
 routes.post('/login', (req: Request, res: Response) => {

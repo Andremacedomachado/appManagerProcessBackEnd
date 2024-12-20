@@ -8,7 +8,8 @@ export class UpdateUserController {
 
     async handle(request: Request, response: Response) {
         try {
-            const dataUpdate = UpdateUserRequestSchema.parse(request.body);
+            const mergeParamsWithBody = { ...request.params, ...request.body }
+            const dataUpdate = UpdateUserRequestSchema.parse(mergeParamsWithBody);
             const userUpdatedOrError = await this.updateUserUseCase.execute(dataUpdate);
             if (userUpdatedOrError instanceof Error) {
                 return response.status(400).json({ error: userUpdatedOrError.message })

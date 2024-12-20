@@ -8,7 +8,7 @@ export class DeleteOrganizationSectorController {
 
     async handle(request: Request, response: Response) {
         try {
-            const { sectorId } = DeleteOrganizationSectorRequestSchema.parse(request.body);
+            const { sectorId } = DeleteOrganizationSectorRequestSchema.parse(request.params);
             const sectorDeletedOrError = await this.deleteOrganizationSectorUseCase.execute(sectorId);
             if (sectorDeletedOrError instanceof Error) {
                 return response.status(400).json({ error: sectorDeletedOrError.message });

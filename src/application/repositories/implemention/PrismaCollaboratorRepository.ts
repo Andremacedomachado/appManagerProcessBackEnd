@@ -1,5 +1,6 @@
 import { prisma } from "../../../database";
 import { IRecordCollaboratorProps, RecordCollaborator } from "../../../domain/entities/RecordCollaborator";
+import { GetCollaboratorsData } from "../../usecases/getCollaborators/GetCollaboratorsDTO";
 import { ICollaboratorRepository, IFilterCollaboratorProps } from "../ICollaboratorReposytory";
 import { Prisma } from "@prisma/client"
 
@@ -187,6 +188,30 @@ export class PrismaCollaboratorRepository implements ICollaboratorRepository {
         return recordsExists
     }
 
+    async findMany({ keys, value }: GetCollaboratorsData): Promise<RecordCollaborator[]> {
+        if (!keys) {
+            const collaborators = (await prisma.collaborators.findMany())
+                .map(collaborator => RecordCollaborator.create(collaborator))
+
+            return collaborators ? collaborators : []
+        }
+
+        const filterValuesString = {
+            contains: value,
+            mode: 'insensitive'
+        } as Prisma.StringFilter
+
+        const collaborators = (await prisma.collaborators.findMany({
+            where: {
+                OR: [
+                    ...keys.map(k => ({
+                        [k]: filterValuesString
+                    }))
+                ]
+            }
+        })).map(collaborator => RecordCollaborator.create(collaborator))
+        return collaborators
+    }
     async delete(recordCollaborator: IRecordCollaboratorProps): Promise<RecordCollaborator | Error> {
         try {
 

@@ -8,8 +8,8 @@ export class DeleteUserController {
 
     async handle(request: Request, response: Response) {
         try {
-            const { userId } = DeleteUserRequestSchema.parse(request.body);
-            const userDeletedOrError = await this.deleteUserUseCase.execute(userId);
+            const { id } = DeleteUserRequestSchema.parse(request.params);
+            const userDeletedOrError = await this.deleteUserUseCase.execute(id);
             if (userDeletedOrError instanceof Error) {
                 return response.status(500).json({ error: userDeletedOrError.message })
             }

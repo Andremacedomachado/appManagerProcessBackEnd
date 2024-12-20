@@ -5,6 +5,8 @@ import { Organization } from "../../domain/entities/Organization"
 import { OrganizationSector } from "../../domain/entities/OrganizationSector"
 import { RecordCollaborator } from "../../domain/entities/RecordCollaborator"
 import { RecordDependency } from "../../domain/entities/RecordDependency"
+import { RecordRole } from "../../domain/entities/RecordRole"
+import { Role } from "../../domain/entities/Role"
 import { User } from "../../domain/entities/User"
 
 
@@ -18,7 +20,13 @@ export type OrganizationDeletedDataReponseType = {
     infoOrganizationDeleted: Organization
 }
 
-export type UserDeletedDataresponseType = {
+export type UserDeletedDataResponseType = {
+    infoUser: User,
+    roles: RecordRole[],
+    collaborators: RecordCollaborator[],
+    messagesInActivity: MessageActivity[],
+    annexsInActivity: AnnexActivity[],
+    activitiesResponsible: Activity[],
 }
 
 export type ActivityDeletedDataResponseType = {
@@ -30,7 +38,7 @@ export type ActivityDeletedDataResponseType = {
 }
 
 export interface IDeleteRecordIntegrationRepository {
-    deleteUserOnCascade(userid: string): Promise<UserDeletedDataresponseType | Error>,
+    deleteUserOnCascade(userid: string): Promise<UserDeletedDataResponseType | Error>,
     deleteSectorOnCascade(sectorId: string): Promise<SectorDeletedDataReponseType | Error>,
     deleteOrganizationOnCascade(organizationId: string): Promise<OrganizationDeletedDataReponseType | Error>,
     deleteActivityOnCascade(activityId: string): Promise<ActivityDeletedDataResponseType | Error>,

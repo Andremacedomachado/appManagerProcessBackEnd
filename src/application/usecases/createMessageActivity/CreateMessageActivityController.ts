@@ -9,8 +9,8 @@ export class CreateMessageActivityController {
     async handle(request: Request, response: Response) {
 
         try {
-            const { content, publication_date, updated_at, typeMessage, activityId, userId } = CreateMessageActivityRequestSchema.parse(request.body);
-            const messageIdOrError = await this.createMessageActivityUseCase.execute({ content, publication_date, updated_at, typeMessage, activityId, userId } as ICreateMessageActivityRequestDTO);
+            const { content, publication_date, updated_at, type_message, activity_id, user_id } = CreateMessageActivityRequestSchema.parse(request.body);
+            const messageIdOrError = await this.createMessageActivityUseCase.execute({ content, publication_date, updated_at, activity_id, type_message, user_id } as ICreateMessageActivityRequestDTO);
             if (messageIdOrError instanceof Error) {
                 return response.status(400).json({ error: messageIdOrError.message });
             }

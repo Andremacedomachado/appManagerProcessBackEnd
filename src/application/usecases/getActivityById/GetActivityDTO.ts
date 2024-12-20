@@ -1,0 +1,28 @@
+import { z } from "zod"
+import { STATUSACTIVITY, TYPENODE } from "../../../domain/entities/Activity"
+
+export interface IGetActivityByIdRequestDTO {
+    activityId: string
+}
+
+export const GetActivityByIdRequestSchema = z.object({
+    activityId: z.string().uuid()
+})
+
+export const GetActivityByIdResponseSchema = z.object({
+    id: z.string().uuid(),
+    title: z.string().min(3),
+    description: z.string(),
+    responsible_id: z.string().uuid(),
+    start_date: z.date().optional()
+        .transform(date => !date ? null : date),
+    due_date: z.date().optional()
+        .transform(date => !date ? null : date),
+    progress_status: z.enum([STATUSACTIVITY.DO_TO, STATUSACTIVITY.CLOSED]),
+    type_node: z.enum([TYPENODE.INITIAL, TYPENODE.FINALLY]).nullable(),
+    created_at: z.date(),
+    updated_at: z.date(),
+    conclusion_date: z.coerce.date().nullable()
+})
+
+export type ActivityByIdReponseType = z.input<typeof GetActivityByIdResponseSchema>

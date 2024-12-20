@@ -17,7 +17,8 @@ export const GetDescendantActivityResponseSchema = z.object({
     progress_status: z.enum([STATUSACTIVITY.DO_TO, STATUSACTIVITY.CLOSED]),
     type_node: z.enum([TYPENODE.INITIAL, TYPENODE.FINALLY]).nullable(),
     created_at: z.date(),
-    updated_at: z.date()
+    updated_at: z.date(),
+    conclusion_date: z.coerce.date().nullable()
 });
 
 export const GetDescendantActivityTreeResponseSchema = z.array(GetDescendantActivityResponseSchema)

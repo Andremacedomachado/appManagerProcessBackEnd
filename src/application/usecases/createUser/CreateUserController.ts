@@ -30,7 +30,7 @@ export class CreateUserController {
             if (error instanceof ZodError) {
                 return response.status(400).json({ sucess: false, errors: error })
             }
-            return response.status(500).json({ error: 'Error Unexpected' })
+            return response.status(500).json({ error: 'Error Unexpected', otherInfo: error })
         }
     }
 };

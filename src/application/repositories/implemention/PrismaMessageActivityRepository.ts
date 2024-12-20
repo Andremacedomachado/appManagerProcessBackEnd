@@ -1,7 +1,7 @@
-import { TypeMessage } from "@prisma/client";
+import { Prisma, TypeMessage } from "@prisma/client";
 import { prisma } from "../../../database";
-import { MessageActivity, TYPEMESSAGE } from "../../../domain/entities/MessageActivity";
-import { IFilterMessageByUserActivityProps, IMessageActivityRepository, IMessageActivityUpdateProps, IRecordMessageIdProps } from "../IMessageActivityRepository";
+import { IMessageActivityProps, MessageActivity, TYPEMESSAGE } from "../../../domain/entities/MessageActivity";
+import { IFilterMessageByUserActivityProps, IMessageActivityRepository, IMessageActivityUpdateProps, IRecordMessageIdProps, KeysMessageActivityFields } from "../IMessageActivityRepository";
 
 export class PrismaMessageActivityRepository implements IMessageActivityRepository {
     async save(recordMessage: MessageActivity): Promise<IRecordMessageIdProps | null> {
@@ -25,6 +25,7 @@ export class PrismaMessageActivityRepository implements IMessageActivityReposito
         if (!activityExists) {
             return null
         }
+
         const { content, publication_date, updated_at, type_message, activity_id, user_id } = recordMessage;
         const messageInDatabase = await prisma.messageAtivity.create({
             data: {
@@ -166,6 +167,47 @@ export class PrismaMessageActivityRepository implements IMessageActivityReposito
             });
         });
         return collectionMessageActivityInMemory;
+    }
+
+    async findMany(query: { keys?: KeysMessageActivityFields, value?: string | Date }): Promise<MessageActivity[]> {
+        const { keys, value } = query;
+        if (!keys) {
+            const messages = await prisma.messageAtivity.findMany()
+            return messages.map(message => MessageActivity.create({ ...message, type_message: message.type_message as unknown as TYPEMESSAGE }))
+        }
+
+
+        const filterString: Prisma.StringFilter = {
+            contains: typeof query.value == 'string' ? query.value : undefined,
+            mode: 'insensitive'
+
+        }
+        const filterDate: Prisma.DateTimeFilter = {
+            equals: query.value instanceof Date ? query.value : undefined
+
+        }
+        const filterEnumTypeMessage: Prisma.EnumTypeMessageFilter = {
+            equals: value && value === TypeMessage.SYSTEM ? TypeMessage.SYSTEM : TypeMessage.USER,
+        }
+        const messages = await prisma.messageAtivity.findMany({
+            where: {
+                OR: [
+                    ...keys.map(k => {
+                        if (value instanceof Date) {
+                            return { [k]: filterDate }
+                        }
+                        if (value && (value.toUpperCase() in TypeMessage)) {
+                            return { [k]: filterEnumTypeMessage }
+                        }
+                        return { [k]: filterString }
+
+
+                    })
+                ]
+            }
+        })
+
+        return messages.map(message => MessageActivity.create({ ...message, type_message: message.type_message as unknown as TYPEMESSAGE }))
     }
     async update(messageUpdate: IMessageActivityUpdateProps): Promise<MessageActivity | null> {
         const { content, publication_date, updated_at, type_message, activity_id, user_id } = messageUpdate;

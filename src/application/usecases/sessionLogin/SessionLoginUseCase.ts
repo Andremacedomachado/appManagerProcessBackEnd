@@ -9,10 +9,9 @@ export class SessionLoginUseCase {
     constructor(private userRepository: IUserRepository) {
     }
 
-    async excute(data: ISessionLoginRequestDTO): Promise<string | Error> {
+    async excute(data: ISessionLoginRequestDTO): Promise<Object | Error> {
 
         const usertExists = await this.userRepository.findByEmail(data.email);
-
         if (!usertExists) {
             return new Error('User ou exist');
         }
@@ -35,7 +34,10 @@ export class SessionLoginUseCase {
             expiresIn: '1H',
         });
 
-        return token;
+        const { props: { password, ...rest }, id } = usertExists
+        const user = { ...rest, id }
+
+        return { user, token };
 
     }
 }

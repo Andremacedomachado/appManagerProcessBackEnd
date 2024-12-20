@@ -8,8 +8,8 @@ export class DeleteActivityController {
 
     async handle(request: Request, response: Response) {
         try {
-            const { activityId } = DeleteActivityRequestSchema.parse(request.body);
-            const activityDeletedOrError = await this.deleteActivityUseCase.execute(activityId);
+            const { id } = DeleteActivityRequestSchema.parse(request.params);
+            const activityDeletedOrError = await this.deleteActivityUseCase.execute(id);
             if (activityDeletedOrError instanceof Error) {
                 return response.status(400).json({ error: activityDeletedOrError.message });
             }

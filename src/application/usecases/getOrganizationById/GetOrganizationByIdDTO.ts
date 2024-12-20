@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const GetOrganizationIdRequestSchema = z.object({
-    organizationId: z.string().uuid()
+    id: z.string().uuid()
 });
 
 export const GetOrganizationResponseSchema = z.object({

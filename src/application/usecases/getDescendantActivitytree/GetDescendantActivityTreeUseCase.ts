@@ -1,5 +1,4 @@
 import { IActivityIntegrationRepository } from "../../repositories/IActivityIntegrationRepository";
-import { IActivityRepository } from "../../repositories/IActivityRepository";
 
 export class GetDescendantActivityTreeUsecase {
     constructor(private activityIntegrationRepository: IActivityIntegrationRepository) { }

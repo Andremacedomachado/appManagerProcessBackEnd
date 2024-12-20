@@ -1,4 +1,5 @@
 import { IMessageActivityProps, MessageActivity, TYPEMESSAGE } from "../../domain/entities/MessageActivity";
+import { GetMessageActivityData } from "../usecases/getMessageActivity/GetMessageActivityDTO";
 
 export type IMessageActivityUpdateProps = {
     content?: string,
@@ -20,6 +21,12 @@ export interface IFilterMessageByUserActivityProps {
     user_id: string,
 }
 
+export type KeysMessageActivityFields = Array<keyof IMessageActivityProps>
+
+export type IMessageActivityQuery = {
+    keys?: KeysMessageActivityFields,
+    value?: string | Date,
+}
 export interface IMessageActivityRepository {
     save(message: MessageActivity): Promise<IRecordMessageIdProps | null>,
     findAll(): Promise<MessageActivity[] | null>,
@@ -27,6 +34,7 @@ export interface IMessageActivityRepository {
     findManyByMessageContent(messageContent: string): Promise<MessageActivity[] | null>,
     findByAtivityId(activityId: string): Promise<MessageActivity[] | null>,
     findByUserId(userId: string): Promise<MessageActivity[] | null>,
+    findMany(query: IMessageActivityQuery): Promise<MessageActivity[]>
     update(messageUpdate: IMessageActivityUpdateProps): Promise<MessageActivity | null>,
     delete(messageId: IRecordMessageIdProps): Promise<MessageActivity | null>,
     deleteCollectionRecordsByUserId(userId: string): Promise<MessageActivity[] | Error>,

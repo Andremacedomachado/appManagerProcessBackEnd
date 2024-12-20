@@ -8,7 +8,7 @@ export class GetOrganizationSectorByIdController {
 
     async handle(request: Request, response: Response) {
         try {
-            const { sectorId } = GetOrganizationSectorRequestSchema.parse(request.body)
+            const { sectorId } = GetOrganizationSectorRequestSchema.parse({ sectorId: request.params.id })
             const sectorOrError = await this.getOrganizationSectorByIdUseCase.execute(sectorId);
             if (sectorOrError instanceof Error) {
                 return response.status(500).json({ error: sectorOrError.message })

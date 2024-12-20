@@ -7,7 +7,10 @@ export interface IOrganizationProps {
     updated_at?: Date,
 }
 
-export class Organization extends Entity<IOrganizationProps>{
+export interface IOrganizationUpdateProps extends Partial<IOrganizationProps> {
+    id: string
+}
+export class Organization extends Entity<IOrganizationProps> {
     constructor(props: IOrganizationProps, id?: string) {
         super(props, id)
     }

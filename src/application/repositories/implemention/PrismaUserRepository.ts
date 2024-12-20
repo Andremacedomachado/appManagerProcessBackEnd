@@ -1,8 +1,10 @@
 import { hash } from 'bcryptjs';
-import { IUserRepository, IUserUpdateManyProps, IUserUpdateProps, UserId } from '../IUserRepository';
+import { IUserRepository, IUserUpdateManyProps, IUserUpdateProps, UserId, keysUserField } from '../IUserRepository';
 
 import { prisma } from '../../../database';
-import { User, UserIsActive } from '../../../domain/entities/User';
+import { IUserProps, User, UserIsActive } from '../../../domain/entities/User';
+import { Prisma, UserStatus } from '@prisma/client';
+import { GetUsersSchema } from '../../usecases/getUsers/GetUsersDTO';
 
 
 export class PrismaUserRepository implements IUserRepository {
@@ -106,7 +108,7 @@ export class PrismaUserRepository implements IUserRepository {
                 return null;
             }
         }
-
+        const hashPassword = userChangeData.password && await hash(userChangeData.password, 8);
         const userUpdatedInDatabase = await prisma.user.update({
             where: {
                 id: userChangeData.id
@@ -114,7 +116,7 @@ export class PrismaUserRepository implements IUserRepository {
             data: {
                 name: userChangeData.name || undefined,
                 email: userChangeData.email || undefined,
-                password: userChangeData.password || undefined,
+                password: hashPassword,
                 organization_sector_id: userChangeData.organization_sector_id || undefined,
                 updated_at: new Date,
                 status: userChangeData.status || undefined
@@ -198,6 +200,51 @@ export class PrismaUserRepository implements IUserRepository {
         })
     }
 
+    async findMany(search?: GetUsersSchema | undefined): Promise<User[]> {
+        if (!search || !search.keys) {
+            const users = await this.findAll()
+            return users ? users : []
+        }
+
+
+        const keys = search.keys
+
+        const value = search.value
+        const filterEnumStatus = {
+            equals: typeof value === 'string' ? value.toUpperCase() : value,
+        } as Prisma.EnumUserStatusFilter
+        const filterValuesString = {
+            contains: value,
+            mode: 'insensitive'
+        } as Prisma.StringFilter
+
+        const filterValuesDate = {
+            equals: value
+        } as Prisma.StringFilter
+
+
+        const usersMatch = await prisma.user.findMany({
+            where: {
+                OR: [
+                    ...keys.map(k => {
+                        if (value instanceof Date) {
+                            return { [k]: filterValuesDate }
+                        }
+                        if (value && (value in UserIsActive)) {
+                            return { [k]: filterEnumStatus }
+                        }
+                        return { [k]: filterValuesString }
+                    })]
+
+            }
+        })
+
+        return usersMatch.map(user => {
+            const { created_at, email, id, name, organization_sector_id, password, status, updated_at } = user;
+            return User.create({ created_at, email, name, organization_sector_id, password, status: <UserIsActive>status, updated_at }, id)
+        })
+    }
+
     async delete(userId: string): Promise<User | Error> {
         try {
             const userDeleted = await prisma.$transaction(async tx => {
@@ -223,15 +270,6 @@ export class PrismaUserRepository implements IUserRepository {
                         ActivitiesResponsible: true
                     }
                 })
-                var recordDenpendet = false;
-                Object.values(user).forEach((propsWithRelation) => {
-                    if (Array.isArray(propsWithRelation) && (propsWithRelation.length != 0)) {
-                        recordDenpendet = true;
-                    }
-                })
-                if (recordDenpendet) {
-                    throw new Error('Record user with correlation record Dependent - oparation invalid')
-                }
                 return user
             })
             return User.create({ ...userDeleted, status: userDeleted.status as UserIsActive }, userDeleted.id);

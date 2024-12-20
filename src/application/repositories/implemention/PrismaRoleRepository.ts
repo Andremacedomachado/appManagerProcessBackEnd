@@ -61,21 +61,20 @@ export class PrismaRoleRepository implements IRoleRepository {
     }
     async findAll(): Promise<Role[] | null> {
         const rolesInDatabase = await prisma.role.findMany()
-        var rolesInMemory: Role[] = [];
 
-        if (rolesInDatabase.length = 0) {
+        if (!rolesInDatabase || rolesInDatabase.length == 0) {
             return null
         }
 
-        rolesInDatabase.forEach(role => {
+        const rolesInMemory = rolesInDatabase.map(role => {
             const { id, name, description, created_at, updated_at } = role
             const roleInMemory = Role.create({
                 name,
-                description: description ?? undefined,
+                description: description ? description : undefined,
                 created_at,
                 updated_at
             }, id);
-            rolesInMemory.push(roleInMemory);
+            return roleInMemory
         })
 
         return rolesInMemory;

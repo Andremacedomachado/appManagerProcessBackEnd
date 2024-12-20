@@ -8,7 +8,7 @@ export class GetMessageByActivityIdController {
 
     async handle(request: Request, response: Response) {
         try {
-            const { activityId } = GetMessageByActivityRequestSchema.parse(request.body);
+            const { activityId } = GetMessageByActivityRequestSchema.parse(request.params);
             const collectionMessageOrError = await this.getMessageByActivityIdUseCase.execute(activityId);
             if (collectionMessageOrError instanceof Error) {
                 return response.status(400).json({ error: collectionMessageOrError.message });

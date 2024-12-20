@@ -1,6 +1,6 @@
 import { Prisma } from "@prisma/client";
 import { prisma } from "../../../database";
-import { OrganizationSector } from "../../../domain/entities/OrganizationSector";
+import { IOrganizationSectorUpdateProps, OrganizationSector } from "../../../domain/entities/OrganizationSector";
 
 import { IOrganizationSectorId, IOrganizationSectorRepository } from "../IOrganizationSectorRepository";
 
@@ -162,6 +162,45 @@ export class PrismaOrganizationSectorRepository implements IOrganizationSectorRe
 
             return new Error('unexpected error')
         }
+    }
+
+    async update(organizationSector: IOrganizationSectorUpdateProps): Promise<OrganizationSector | null> {
+        const sectorExists = await prisma.organizationSector.findFirst({
+            where: {
+                id: organizationSector.id
+            }
+        })
+        if (organizationSector.organization_id) {
+
+            const organizationExists = await prisma.organization.findFirst({
+                where: {
+                    id: organizationSector.organization_id
+                }
+            })
+            if (!organizationExists) {
+                return null
+            }
+        }
+
+        if (!sectorExists) {
+            return null
+        }
+        const { id, created_at, employeesAllocated, name, organization_id, updated_at } = organizationSector
+        const organizationSectorUpdated = await prisma.organizationSector.update({
+            where: {
+                id
+            },
+            data: {
+                name,
+                employees_allocated: employeesAllocated,
+                created_at,
+                updated_at,
+                organization_id,
+            }
+        })
+
+        const organizationSectorInMemory = new OrganizationSector({ ...organizationSectorUpdated, employeesAllocated: organizationSectorUpdated.employees_allocated }, organizationSectorUpdated.id)
+        return organizationSectorInMemory;
     }
 
     async findAllSectorByOrganization(organization_id: string): Promise<OrganizationSector[] | Error> {

@@ -8,7 +8,7 @@ export class GetCollaboratorByUserController {
 
     async handle(request: Request, response: Response) {
         try {
-            const { userId } = GetCollaboratorsByUserRequestSchema.parse(request.body);
+            const { userId } = GetCollaboratorsByUserRequestSchema.parse(request.params);
             const recordsCollaboratorOrError = await this.getCollaboratorByUserUseCase.execute(userId);
             if (recordsCollaboratorOrError instanceof Error) {
                 return response.status(400).json({ error: recordsCollaboratorOrError.message });

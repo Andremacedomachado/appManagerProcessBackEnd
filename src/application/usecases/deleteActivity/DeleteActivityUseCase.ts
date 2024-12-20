@@ -1,6 +1,4 @@
 import { IActivityRepository } from "../../repositories/IActivityRepository";
-import { IDeleteRecordIntegrationRepository } from "../../repositories/IDeleteRecordIntegrationRepository";
-
 export class DeleteActivityUseCase {
     constructor(private activityRepository: IActivityRepository) { }
 

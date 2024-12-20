@@ -5,12 +5,13 @@ import { MessageActivity, TYPEMESSAGE } from "../../../domain/entities/MessageAc
 import { Organization } from "../../../domain/entities/Organization";
 import { RecordCollaborator } from "../../../domain/entities/RecordCollaborator";
 import { RecordDependency } from "../../../domain/entities/RecordDependency";
-import { User } from "../../../domain/entities/User";
+import { RecordRole } from "../../../domain/entities/RecordRole";
+import { User, UserIsActive } from "../../../domain/entities/User";
 import { IActivityRelationRepository } from "../IActivityRelationRepository";
 import { IActivityRepository } from "../IActivityRepository";
 import { IAnnexActivityRepository } from "../IAnnexActivityRepository";
 import { ICollaboratorRepository } from "../ICollaboratorReposytory";
-import { ActivityDeletedDataResponseType, IDeleteRecordIntegrationRepository, OrganizationDeletedDataReponseType, SectorDeletedDataReponseType, UserDeletedDataresponseType } from "../IDeleteRecordIntegrationRepository";
+import { ActivityDeletedDataResponseType, IDeleteRecordIntegrationRepository, OrganizationDeletedDataReponseType, SectorDeletedDataReponseType, UserDeletedDataResponseType } from "../IDeleteRecordIntegrationRepository";
 import { IMessageActivityRepository } from "../IMessageActivityRepository";
 import { IOrganizationRepository } from "../IOrganizationRepository";
 import { IOrganizationSectorRepository } from "../IOrganizationSectorRepository";
@@ -34,18 +35,47 @@ export class PrismaDeleteRecordInterationRepository implements IDeleteRecordInte
         private messageActivityRepository: IMessageActivityRepository,
         private annexActivityRepository: IAnnexActivityRepository,
     ) { }
-    async deleteUserOnCascade(userid: string): Promise<UserDeletedDataresponseType | Error> {
+    async deleteUserOnCascade(userid: string): Promise<UserDeletedDataResponseType | Error> {
 
-        const userExists = await prisma.user.findUnique({
-            where: {
-                id: userid
-            }
-        })
+        try {
+            const user = await prisma.$transaction(async tx => {
+                const userdeleted = await prisma.user.delete({
+                    where: {
+                        id: userid
+                    },
+                    select: {
+                        id: true,
+                        name: true,
+                        email: true,
+                        password: true,
+                        created_at: true,
+                        status: true,
+                        organization_sector_id: true,
+                        updated_at: true,
+                        registerRole: true,
+                        Annex: true,
+                        Collaborators: true,
+                        MessageAtivity: true,
+                        ActivitiesResponsible: true
+                    }
+                })
+                const { Annex, Collaborators, MessageAtivity, ActivitiesResponsible, registerRole, id, ...infoUser } = userdeleted
+                return {
+                    infoUser: User.create({ ...infoUser, status: infoUser.status as UserIsActive }, id),
+                    roles: registerRole.map(role => RecordRole.create(role)),
+                    collaborators: Collaborators.map(record => RecordCollaborator.create(record)),
+                    annexsInActivity: Annex.map(record => AnnexActivity.create(record)),
+                    messagesInActivity: MessageAtivity.map(record => MessageActivity.create({
+                        ...record,
+                        type_message: record.type_message as TYPEMESSAGE
+                    }))
+                } as UserDeletedDataResponseType;
+            })
 
-        if (!userExists) return new Error('User not exists');
-
-
-        throw new Error("Method not implemented.");
+            return user
+        } catch (error) {
+            return error as Error
+        }
     }
 
     async unlinkAllSectorUsers(sectorId: string): Promise<User[] | Error> {

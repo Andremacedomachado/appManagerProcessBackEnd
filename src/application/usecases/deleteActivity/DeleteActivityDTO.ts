@@ -2,7 +2,7 @@ import { z } from "zod"
 import { STATUSACTIVITY, TYPENODE } from "../../../domain/entities/Activity"
 
 export const DeleteActivityRequestSchema = z.object({
-    activityId: z.string().uuid()
+    id: z.string().uuid()
 })
 
 export const DeleteActivityResponseSchema = z.object({
@@ -17,7 +17,8 @@ export const DeleteActivityResponseSchema = z.object({
     progress_status: z.enum([STATUSACTIVITY.DO_TO, STATUSACTIVITY.CLOSED]),
     type_node: z.enum([TYPENODE.INITIAL, TYPENODE.FINALLY]).nullable(),
     created_at: z.date(),
-    updated_at: z.date()
+    updated_at: z.date(),
+    conclusion_date: z.coerce.date().nullable()
 })
 
 export type DeleteActivityResponseDTO = z.input<typeof DeleteActivityResponseSchema>

@@ -28,3 +28,5 @@ export const UserFullInfoResponseSchema = z.object({
     organization_linked: z.union([SectorResponseSchema, z.null()]),
     roles: z.array(RoleResponseSchema).optional()
 });
+
+export type UserFullInfoResponseData = z.infer<typeof UserFullInfoResponseSchema> 

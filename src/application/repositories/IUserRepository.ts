@@ -1,5 +1,6 @@
 import { UserStatus } from "@prisma/client"
-import { User } from "../../domain/entities/User"
+import { IUserProps, User } from "../../domain/entities/User"
+import { GetUsersSchema } from "../usecases/getUsers/GetUsersDTO"
 
 export type UserId = {
     id: string
@@ -34,5 +35,8 @@ export interface IUserRepository {
     getManyBySector(sectorId: string): Promise<User[]>
     updatedMany(dataChangeMany: IUserUpdateManyProps): Promise<User[]>
     findManyByCollenctionIds(userIds: string[]): Promise<User[]>
+    findMany(search?: GetUsersSchema): Promise<User[]>
     delete(userId: string): Promise<User | Error>
 }
+
+export type keysUserField = Array<keyof (Omit<IUserProps, 'password'> & { id: string })>

@@ -110,9 +110,6 @@ export class PrismaAnnexActivityRepository implements IAnnexActivityRepository {
             }
         });
 
-        if (collectionAnnexActivity.length == 0) {
-            return null
-        }
 
         const collectionAnnexActivityInMemory = collectionAnnexActivity.map(annexActivityInDatabase => {
             const { original_name, activity_id, file_name, publication_date, url, user_id } = annexActivityInDatabase;

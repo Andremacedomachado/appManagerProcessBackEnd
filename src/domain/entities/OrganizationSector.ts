@@ -8,7 +8,11 @@ export interface IOrganizationSectorProps {
     organization_id: string | null
 }
 
-export class OrganizationSector extends Entity<IOrganizationSectorProps>{
+export interface IOrganizationSectorUpdateProps extends Partial<IOrganizationSectorProps> {
+    id: string
+}
+
+export class OrganizationSector extends Entity<IOrganizationSectorProps> {
     constructor(props: IOrganizationSectorProps, id?: string) {
         super(props, id)
     }

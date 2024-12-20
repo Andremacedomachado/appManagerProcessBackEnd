@@ -10,7 +10,7 @@ export const GetOrganizationSectorResponseSchema = z.object({
     created_at: z.date(),
     updated_at: z.date(),
     employeesAllocated: z.number().nonnegative(),
-    organization_id: z.string().uuid()
+    organization_id: z.string().uuid().nullable()
 })
 
 export type GetOrganizationSectorResponseDTO = z.input<typeof GetOrganizationSectorResponseSchema>

@@ -18,7 +18,10 @@ export const ActivityTreeByUserResponseSchema = z.object({
         progress_status: z.enum([STATUSACTIVITY.DO_TO, STATUSACTIVITY.CLOSED]),
         type_node: z.enum([TYPENODE.INITIAL, TYPENODE.FINALLY]).nullable(),
         created_at: z.date(),
-        updated_at: z.date()
+        updated_at: z.date(),
+        conclusion_date: z.coerce.date().nullable(),
+        project_id: z.string().uuid(),
+        sector_id: z.string().uuid()
     })),
     collaborators: z.array(z.object({
         user_id: z.string().uuid(),

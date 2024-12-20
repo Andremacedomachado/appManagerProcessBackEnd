@@ -2,7 +2,7 @@ import { z } from "zod"
 import { UserIsActive } from "../../../domain/entities/User"
 
 export const DeleteUserRequestSchema = z.object({
-    userId: z.string().uuid()
+    id: z.string().uuid()
 })
 
 export const DeleteUserResponseSchema = z.object({

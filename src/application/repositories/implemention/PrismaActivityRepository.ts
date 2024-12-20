@@ -1,11 +1,12 @@
 import { NodeTypeActivity, Prisma, ProgressStatusActivity } from '@prisma/client';
 import { prisma } from '../../../database';
-import { IActivityProps, Activity, TYPENODE, STATUSACTIVITY } from '../../../domain/entities/Activity';
-import { IActivityId, IActivityRepository, IActivityUniqueContentProps, IActivityUpdateProps } from '../IActivityRepository'
+import { IActivityProps, Activity, TYPENODE, STATUSACTIVITY, IActivityUpdateProps } from '../../../domain/entities/Activity';
+import { IActivityId, IActivityQuery, IActivityRepository, IActivityUniqueContentProps } from '../IActivityRepository'
+import { isValid } from 'date-fns';
 
 export class PrismaActivityRepository implements IActivityRepository {
-    async save(activity: Activity): Promise<IActivityId | null> {
-        const { title, description, created_at, updated_at, due_date, start_date, progress_status, responsible_id, type_node }: IActivityProps = activity.props;
+    async save(activity: Activity): Promise<IActivityId> {
+        const { title, description, created_at, updated_at, due_date, start_date, progress_status, responsible_id, type_node, conclusion_date, project_id, sector_id }: IActivityProps = activity.props;
 
         const activityInDatabase = await prisma.activity.create({
             data: {
@@ -18,6 +19,9 @@ export class PrismaActivityRepository implements IActivityRepository {
                 responsible_id,
                 progress_status: progress_status ? progress_status : ProgressStatusActivity.DO_TO,
                 type_node: type_node ? type_node : NodeTypeActivity.INITIAL,
+                conclusion_date,
+                project_id,
+                sector_id,
             }
         });
 
@@ -33,7 +37,7 @@ export class PrismaActivityRepository implements IActivityRepository {
         if (!activityExists) {
             return null;
         }
-        const { title, description, created_at, updated_at, responsible_id, start_date, due_date, progress_status, type_node } = activityExists
+        const { title, description, created_at, updated_at, responsible_id, start_date, due_date, progress_status, type_node, conclusion_date, project_id, sector_id } = activityExists
         const activityInMemory = Activity.create({
             title,
             description: !description ? undefined : description,
@@ -43,20 +47,21 @@ export class PrismaActivityRepository implements IActivityRepository {
             start_date: !start_date ? undefined : start_date,
             due_date: !due_date ? undefined : due_date,
             progress_status: progress_status as unknown as STATUSACTIVITY,
-            type_node: type_node as unknown as TYPENODE
+            type_node: type_node as unknown as TYPENODE,
+            conclusion_date,
+            project_id,
+            sector_id
         }, activityExists.id)
 
         return activityInMemory;
     }
-    async findAll(): Promise<Activity[] | null> {
+    async findAll(): Promise<Activity[]> {
 
         const activitiesAllExists = await prisma.activity.findMany({});
-        if (activitiesAllExists.length == 0) {
-            return null;
-        }
+
         const activitiesInMemory: Activity[] = [];
         activitiesAllExists.forEach(activityInDatabase => {
-            const { id, title, description, created_at, updated_at, responsible_id, start_date, due_date, progress_status, type_node } = activityInDatabase
+            const { id, title, description, created_at, updated_at, responsible_id, start_date, due_date, progress_status, type_node, conclusion_date, project_id, sector_id } = activityInDatabase
             const activityInMemory = Activity.create({
                 title,
                 description: !description ? undefined : description,
@@ -66,7 +71,10 @@ export class PrismaActivityRepository implements IActivityRepository {
                 due_date: !due_date ? undefined : due_date,
                 start_date: !start_date ? undefined : start_date,
                 progress_status: progress_status as unknown as STATUSACTIVITY,
-                type_node: type_node as unknown as TYPENODE
+                type_node: type_node as unknown as TYPENODE,
+                conclusion_date,
+                project_id,
+                sector_id
             }, id)
             activitiesInMemory.push(activityInMemory);
         })
@@ -85,7 +93,7 @@ export class PrismaActivityRepository implements IActivityRepository {
             return null;
         }
 
-        const { id, title, description, created_at, updated_at, start_date, due_date, progress_status, responsible_id, type_node } = activityInDatabase
+        const { id, title, description, created_at, updated_at, start_date, due_date, progress_status, responsible_id, type_node, conclusion_date, project_id, sector_id } = activityInDatabase
         const activityInMemory = Activity.create({
             title: title,
             description: description || undefined,
@@ -95,7 +103,10 @@ export class PrismaActivityRepository implements IActivityRepository {
             start_date: !start_date ? undefined : start_date,
             responsible_id: responsible_id,
             progress_status: progress_status as unknown as STATUSACTIVITY || undefined,
-            type_node: type_node as unknown as TYPENODE
+            type_node: type_node as unknown as TYPENODE,
+            conclusion_date,
+            project_id,
+            sector_id
         }, id)
 
         return activityInMemory;
@@ -117,27 +128,26 @@ export class PrismaActivityRepository implements IActivityRepository {
             return null;
         }
 
-        const { id, title, description, created_at, updated_at, due_date, start_date, progress_status, responsible_id, type_node } = activityInDatabase
+        const { id, title, description, created_at, updated_at, due_date, start_date, progress_status, responsible_id, type_node, conclusion_date, project_id, sector_id } = activityInDatabase
         const activityInMemory = Activity.create({
             title,
-            description: !description ? undefined : description,
+            description,
             created_at,
             updated_at,
             responsible_id,
-            due_date: !due_date ? undefined : due_date,
+            due_date,
             start_date: !start_date ? undefined : start_date,
             progress_status: progress_status as unknown as STATUSACTIVITY || undefined,
-            type_node: type_node as unknown as TYPENODE
+            type_node: type_node as unknown as TYPENODE,
+            conclusion_date,
+            project_id,
+            sector_id
         }, id);
 
         return activityInMemory;
     }
 
-    async update(activityChangeData: IActivityUpdateProps): Promise<Activity | null> {
-        const activityInDatabase = await this.findById(activityChangeData.id);
-        if (!activityInDatabase) {
-            return null
-        }
+    async update(activityChangeData: IActivityUpdateProps): Promise<Activity> {
 
         const activityUpdatedInDatabase = await prisma.activity.update({
             where: {
@@ -148,24 +158,31 @@ export class PrismaActivityRepository implements IActivityRepository {
                 description: activityChangeData.description || undefined,
                 created_at: activityChangeData.created_at || undefined,
                 updated_at: activityChangeData.updated_at || undefined,
-                due_date: activityChangeData.due_date || undefined,
+                due_date: activityChangeData.due_date,
                 start_date: activityChangeData.start_date || undefined,
                 responsible_id: activityChangeData.responsible_id || undefined,
                 progress_status: activityChangeData.progress_status as unknown as ProgressStatusActivity || undefined,
-                type_node: activityChangeData.type_node ? activityChangeData.type_node as unknown as NodeTypeActivity : undefined
+                type_node: activityChangeData.type_node ? activityChangeData.type_node as unknown as NodeTypeActivity : undefined,
+                conclusion_date: activityChangeData.conclusion_date,
+                sector_id: activityChangeData.sector_id ? activityChangeData.sector_id : undefined,
+                project_id: activityChangeData.project_id,
+
             }
         })
-        const { id, title, description, created_at, updated_at, responsible_id, due_date, start_date, progress_status, type_node } = activityUpdatedInDatabase
+        const { id, title, description, created_at, updated_at, responsible_id, due_date, start_date, progress_status, type_node, conclusion_date, project_id, sector_id } = activityUpdatedInDatabase
         const activityUpdatedInMemory = Activity.create({
             title,
-            description: !description ? undefined : description,
+            description,
             created_at,
             updated_at,
             responsible_id,
-            due_date: !due_date ? undefined : due_date,
+            due_date,
             start_date: !start_date ? undefined : start_date,
             progress_status: progress_status as unknown as STATUSACTIVITY,
-            type_node: type_node as unknown as TYPENODE
+            type_node: type_node as unknown as TYPENODE,
+            conclusion_date,
+            project_id,
+            sector_id
         }, id);
 
         return activityUpdatedInMemory;
@@ -189,18 +206,18 @@ export class PrismaActivityRepository implements IActivityRepository {
                         responsible_id: true,
                         type_node: true,
                         updated_at: true,
+                        conclusion_date: true,
                         Annex: true,
                         Collaborators: true,
                         ChildrenRelationship: true,
                         ParentRelationship: true,
                         MessageAtivity: true,
+                        project_id: true,
+                        sector_id: true
                     }
                 });
 
-                const { id, title, description, created_at, updated_at, responsible_id, due_date, start_date, progress_status, type_node, Annex, ChildrenRelationship, Collaborators, MessageAtivity, ParentRelationship } = activityData;
-                if ((Annex.length != 0) || (Collaborators.length != 0) || (MessageAtivity.length != 0) || (ParentRelationship.length != 0) || (ChildrenRelationship.length != 0)) {
-                    throw new Error("Operation invalid -  exists one or more records correlation with activityRecord Activity exits Records Dependent")
-                }
+                const { id, title, description, created_at, updated_at, responsible_id, due_date, start_date, progress_status, type_node, conclusion_date, project_id, sector_id } = activityData;
                 const activityDeletedInMemory = Activity.create({
                     title,
                     description: !description ? undefined : description,
@@ -210,7 +227,10 @@ export class PrismaActivityRepository implements IActivityRepository {
                     due_date: !due_date ? undefined : due_date,
                     start_date: !start_date ? undefined : start_date,
                     progress_status: progress_status as STATUSACTIVITY,
-                    type_node: type_node as TYPENODE
+                    type_node: type_node as TYPENODE,
+                    conclusion_date,
+                    project_id,
+                    sector_id
                 }, id);
                 return activityDeletedInMemory
             })
@@ -225,4 +245,97 @@ export class PrismaActivityRepository implements IActivityRepository {
         }
     }
 
+    async findMany(query: IActivityQuery): Promise<Activity[]> {
+        const { keys, values } = query
+
+        if (keys.length > 1 && values.length == 1) {
+            const filterDate = { equals: values[0] } as Prisma.DateTimeFilter
+            const filterString = {
+                contains: values[0],
+                mode: 'insensitive',
+            } as Prisma.StringFilter;
+            const filterNull = { equals: null } as Prisma.StringNullableFilter
+            const filterFieldEnum = {
+                equals: values[0]
+            } as Prisma.EnumProgressStatusActivityFilter
+            const activitiesMacth = await prisma.activity.findMany({
+                where: {
+                    OR: [
+                        ...keys.map(k => {
+                            if (values[0] instanceof Date) {
+                                return { [k]: filterDate }
+                            }
+                            if (values[0] && (values[0] in STATUSACTIVITY || values[0] in TYPENODE)) {
+                                return { [k]: filterFieldEnum }
+                            }
+                            if (values[0]) {
+
+                                return { [k]: filterString }
+                            }
+
+                            return { [k]: filterNull }
+                        })
+                    ]
+                }
+            })
+
+            const activitiesInMemory = activitiesMacth.map(activity => Activity.create({
+                ...activity,
+                progress_status: activity.progress_status as unknown as STATUSACTIVITY,
+                type_node: activity.type_node as unknown as TYPENODE,
+                due_date: activity.due_date,
+                start_date: !activity.start_date ? undefined : activity.start_date,
+                conclusion_date: activity.conclusion_date
+            }, activity.id))
+
+            return activitiesInMemory
+        }
+
+        else {
+            console.log('infra valores pareados', keys, values, typeof keys, typeof values)
+            const FilterCreated = keys.map((k, index) => {
+                const filterDate = { equals: values[index] } as Prisma.DateTimeFilter
+                const filterString = {
+                    contains: values[index],
+                    mode: 'insensitive',
+                } as Prisma.StringFilter;
+                const filterFieldEnum = {
+                    equals: values[index]
+                } as Prisma.EnumProgressStatusActivityFilter
+                if (isValid(new Date(values[index] as string)) || values[index] instanceof Date) {
+                    console.log("filter date", keys[index], filterDate)
+                    return { [k]: filterDate }
+                }
+                if (values[index] && (values[index] in STATUSACTIVITY || values[index] in TYPENODE)) {
+                    console.log("filter enum", keys[index])
+                    return { [k]: filterFieldEnum }
+                }
+                console.log("filter string", keys[index], filterString)
+                return { [k]: filterString }
+            })
+
+            console.log("filter", FilterCreated)
+            const activitiesMacth = await prisma.activity.findMany({
+                where: {
+                    AND: [
+                        ...FilterCreated
+                    ]
+                }
+            })
+
+            const activitiesInMemory = activitiesMacth.map(activity => Activity.create({
+                ...activity,
+                progress_status: activity.progress_status as unknown as STATUSACTIVITY,
+                type_node: activity.type_node as unknown as TYPENODE,
+                due_date: activity.due_date,
+                start_date: !activity.start_date ? undefined : activity.start_date,
+                conclusion_date: activity.conclusion_date
+            }, activity.id))
+
+            return activitiesInMemory
+        }
+
+
+
+    }
 }

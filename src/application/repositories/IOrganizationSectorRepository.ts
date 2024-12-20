@@ -1,4 +1,4 @@
-import { OrganizationSector } from "../../domain/entities/OrganizationSector"
+import { IOrganizationSectorUpdateProps, OrganizationSector } from "../../domain/entities/OrganizationSector"
 
 export interface IOrganizationSectorId {
     id: string
@@ -12,5 +12,6 @@ export interface IOrganizationSectorRepository {
     findManyByIds(organizationIds: string[]): Promise<OrganizationSector[] | null>,
     findSectorsByOrganizationId(organizationId: string): Promise<OrganizationSector[]>
     delete(organizationId: string): Promise<OrganizationSector | Error>,
+    update(organizationSector: IOrganizationSectorUpdateProps): Promise<OrganizationSector | null>,
     findAllSectorByOrganization(organization_id: string): Promise<OrganizationSector[] | Error>
 }

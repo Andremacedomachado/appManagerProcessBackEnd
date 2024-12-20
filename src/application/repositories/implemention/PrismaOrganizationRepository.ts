@@ -1,5 +1,5 @@
 import { prisma } from "../../../database";
-import { Organization } from "../../../domain/entities/Organization";
+import { IOrganizationUpdateProps, Organization } from "../../../domain/entities/Organization";
 import { IOrganizationId, IOrganizationRepository } from "../IOrganizationRepository";
 
 
@@ -115,6 +115,27 @@ export class PrismaOrganizationRepository implements IOrganizationRepository {
         })
 
         return organizationsInMemory;
+    }
+
+    async update(organization: IOrganizationUpdateProps): Promise<Organization | null> {
+        const organizationExists = await this.findById(organization.id)
+        if (!organizationExists) {
+            return null
+        }
+        const { id, employeesAllocated, created_at, name, updated_at } = organization
+        const organizationUpdated = await prisma.organization.update({
+            where: {
+                id
+            },
+            data: {
+                name,
+                employees_allocated: employeesAllocated,
+                updated_at,
+                created_at,
+            }
+        })
+        const organizationUpdatedInMemory = new Organization({ employeesAllocated: organizationUpdated.employees_allocated, ...organizationUpdated }, id)
+        return organizationUpdatedInMemory
     }
 
     async delete(organizationId: string): Promise<Organization | Error> {

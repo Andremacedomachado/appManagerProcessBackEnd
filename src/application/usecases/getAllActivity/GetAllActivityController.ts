@@ -12,9 +12,9 @@ export class GetAllActivityController {
                 return response.status(400).json({ error: activitiesOrError.message });
             }
             const responseInFormat = GetAllActivityResponseSchema.parse(activitiesOrError.map(activity => {
-                const { title, description, responsible_id, due_date, created_at, progress_status, start_date, type_node, updated_at } = activity.props
+                const { title, description, responsible_id, due_date, created_at, progress_status, start_date, type_node, updated_at, conclusion_date } = activity.props
                 return {
-                    id: activity.id, title, description, responsible_id, due_date, created_at, progress_status, start_date, type_node, updated_at
+                    id: activity.id, title, description, responsible_id, due_date, created_at, progress_status, start_date, type_node, updated_at, conclusion_date
                 } as ActivityResponseDTO;
             }))
             return response.status(200).json(responseInFormat);

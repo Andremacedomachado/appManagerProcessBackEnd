@@ -8,16 +8,16 @@ export class GetDescendatActivityTreeController {
 
     async handle(request: Request, response: Response) {
         try {
-            const { activityId } = GetDescendantActivityTreeRequestSchema.parse(request.body);
+            const { activityId } = GetDescendantActivityTreeRequestSchema.parse(request.params);
             const activityTreerError = await this.getDescendantActivityTreeUseCase.execute(activityId);
             if (activityTreerError instanceof Error) {
                 return response.status(400).json({ error: activityTreerError.message });
             }
 
             const responseInFormat = GetDescendantActivityTreeResponseSchema.parse(activityTreerError.map(activity => {
-                const { responsible_id, title, created_at, description, due_date, progress_status, start_date, type_node, updated_at } = activity.props
+                const { responsible_id, title, created_at, description, due_date, progress_status, start_date, type_node, updated_at, conclusion_date } = activity.props
                 return {
-                    id: activity.id, responsible_id, title, created_at, description, due_date, progress_status, start_date, type_node, updated_at
+                    id: activity.id, responsible_id, title, created_at, description, due_date, progress_status, start_date, type_node, updated_at, conclusion_date
                 } as GetDescendantActivityResponseDTO
             }))
             return response.status(200).json(responseInFormat);

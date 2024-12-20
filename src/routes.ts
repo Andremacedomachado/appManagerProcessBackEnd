@@ -62,23 +62,41 @@ import { deleteRecordDependencyByCorrelationController } from './application/use
 import { deleteRecordDependencyController } from './application/usecases/deleteRecordDependency';
 import { deleteActivityOnCascadeController } from './application/usecases/deleteActivityOnCascade';
 import { deleteUserController } from './application/usecases/deleteUser';
+import { getActivityByIdController } from './application/usecases/getActivityById';
+import { getActivityAdjacentController } from './application/usecases/getActivityAdjacent';
+import { getAnnexsInfoByActivityController } from './application/usecases/getAnnexsInfoByActivityId';
+import { updateActivityByIdController } from './application/usecases/updateActivityById';
+import { getAllRolesController } from './application/usecases/getAllRoles';
+import { updateOrganizationController } from './application/usecases/updateOrganization';
+import { updateOrganizationSectorController } from './application/usecases/updateOrganizationSector';
+import { getUsersController } from './application/usecases/getUsers';
+import { getCollaboratorsController } from './application/usecases/getCollaborators';
+import { getMessageActivityController } from './application/usecases/getMessageActivity';
+import { getProjectController } from './application/usecases/getProject';
+import { createProjectController } from './application/usecases/createProject';
+import { updateProjectController } from './application/usecases/updateProject';
+import { deleteProjectController } from './application/usecases/deleteProject';
 
 const routes = Router();
 
 const upload = multer(multerConfig);
 
-routes.get('/', (req: Request, res: Response) => {
+routes.get('/', isAuthenticated(), (req: Request, res: Response) => {
     res.json({
         'message': 'Hello word!!'
     })
 })
 
 //rotes user
-routes.get('/users', isAuthenticated(), (req: Request, res: Response) => {
+routes.get('/user', (req: Request, res: Response) => {
     return getAllUsersController.handle(req, res);
 });
 
-routes.get('/user', isAuthenticated(), (req: Request, res: Response) => {
+routes.get('/users', (req: Request, res: Response) => {
+    return getUsersController.handle(req, res);
+});
+
+routes.get('/user/:userId', isAuthenticated(), (req: Request, res: Response) => {
     return getUserByIdController.handle(req, res);
 });
 
@@ -86,7 +104,7 @@ routes.get('/users/colletion', isAuthenticated(), (req: Request, res: Response) 
     return getUserByCollectionIdsController.handle(req, res);
 });
 
-routes.post('/users', isAuthenticated(), (req: Request, res: Response) => {
+routes.post('/user', isAuthenticated(), (req: Request, res: Response) => {
     return createUserController.handle(req, res);
 });
 
@@ -98,7 +116,7 @@ routes.post('/user', isAuthenticated(), (req: Request, res: Response) => {
     return changeWorkerStatusController.handle(req, res);
 });
 
-routes.put('/users', isAuthenticated(), (req: Request, res: Response) => {
+routes.put('/user/:id', isAuthenticated(), (req: Request, res: Response) => {
     return updateUserController.handle(req, res);
 });
 
@@ -106,7 +124,8 @@ routes.put('/users/many', isAuthenticated(), (req: Request, res: Response) => {
     return updateManyUserController.handle(req, res);
 });
 
-routes.delete('/users', isAuthenticated(), (req: Request, res: Response) => {
+
+routes.delete('/user/:id', isAuthenticated(), (req: Request, res: Response) => {
     return deleteUserController.handle(req, res);
 });
 
@@ -122,15 +141,23 @@ routes.post('/roles', isAuthenticated(), (req: Request, res: Response) => {
     return createRoleController.handle(req, res);
 });
 
+routes.get('/roles', isAuthenticated(), (req: Request, res: Response) => {
+    return getAllRolesController.handle(req, res);
+});
+
 export { routes };
 
 //routes Organization
 
-routes.post('/organizations', isAuthenticated(), (req: Request, res: Response) => {
+routes.post('/organization', isAuthenticated(), (req: Request, res: Response) => {
     return createOrganizationController.handle(req, res);
 });
 
-routes.get('/organization', isAuthenticated(), (req: Request, res: Response) => {
+routes.put('/organization/:id', isAuthenticated(), (req: Request, res: Response) => {
+    return updateOrganizationController.handle(req, res);
+});
+
+routes.get('/organization/:id', isAuthenticated(), (req: Request, res: Response) => {
     return getOrganizationByIdController.handle(req, res);
 });
 
@@ -148,26 +175,49 @@ routes.post('/sectors', isAuthenticated(), (req: Request, res: Response) => {
     return createOrganizationSectorController.handle(req, res);
 });
 
-routes.get('/sectors', isAuthenticated(), (req: Request, res: Response) => {
+routes.get('/sector', isAuthenticated(), (req: Request, res: Response) => {
     return getAllOrganizationSectorController.handle(req, res);
 });
 
-routes.get('/sector', isAuthenticated(), (req: Request, res: Response) => {
+routes.get('/sector/:id', isAuthenticated(), (req: Request, res: Response) => {
     return getOrganizationSectorByIdController.handle(req, res);
+});
+routes.put('/sector/:id', isAuthenticated(), (req: Request, res: Response) => {
+    return updateOrganizationSectorController.handle(req, res);
 });
 
 routes.get('/sectors/byOrganization', isAuthenticated(), (req: Request, res: Response) => {
     return getSectorsByOrganizationIdController.handle(req, res);
 });
 
-routes.delete('/sectors', isAuthenticated(), (req: Request, res: Response) => {
+routes.delete('/sector/:sectorId', isAuthenticated(), (req: Request, res: Response) => {
     return deleteOrganizationSectorController.handle(req, res)
 })
 
+//routes Projects
+
+routes.get('/project', isAuthenticated(), (req: Request, res: Response) => {
+    return getProjectController.handle(req, res)
+})
+
+routes.post('/project', isAuthenticated(), (req: Request, res: Response) => {
+    return createProjectController.handle(req, res)
+})
+
+routes.put('/project', isAuthenticated(), (req: Request, res: Response) => {
+    return updateProjectController.handle(req, res)
+})
+
+routes.delete('/project', isAuthenticated(), (req: Request, res: Response) => {
+    return deleteProjectController.handle(req, res)
+})
 //routes Activities
 
 routes.post('/activities', isAuthenticated(), (req: Request, res: Response) => {
     return createActivityController.handle(req, res);
+});
+routes.put('/activity/:id', isAuthenticated(), (req: Request, res: Response) => {
+    return updateActivityByIdController.handle(req, res);
 });
 
 routes.get('/activities', isAuthenticated(), (req: Request, res: Response) => {
@@ -178,7 +228,11 @@ routes.get('/activity', isAuthenticated(), (req: Request, res: Response) => {
     return getActivityController.handle(req, res);
 })
 
-routes.get('/activityTree', isAuthenticated(), (req: Request, res: Response) => {
+routes.get('/activity/:activityId', isAuthenticated(), (req: Request, res: Response) => {
+    return getActivityByIdController.handle(req, res);
+})
+
+routes.get('/activityTree/:activityId', isAuthenticated(), (req: Request, res: Response) => {
     return getDescendantActivityTreeController.handle(req, res);
 })
 
@@ -194,7 +248,7 @@ routes.post('/changeActivityTreeProcessStatus', isAuthenticated(), (req: Request
     return changeActivityTreeProcessStatusController.handle(req, res);
 })
 
-routes.delete('/activity', isAuthenticated(), (req: Request, res: Response) => {
+routes.delete('/activity/:id', isAuthenticated(), (req: Request, res: Response) => {
     return deleteActivityController.handle(req, res);
 })
 
@@ -202,6 +256,10 @@ routes.delete('/activity', isAuthenticated(), (req: Request, res: Response) => {
 
 routes.post('/recordDependency', isAuthenticated(), (req: Request, res: Response) => {
     return createRecordDependencyController.handle(req, res);
+})
+
+routes.get('/recordDependency', isAuthenticated(), (req: Request, res: Response) => {
+    return getActivityAdjacentController.handler(req, res)
 })
 
 routes.delete('/recordDependency', isAuthenticated(), (req: Request, res: Response) => {
@@ -218,11 +276,15 @@ routes.post('/collaborators', isAuthenticated(), (req: Request, res: Response) =
     return createCollaboratorController.handle(req, res);
 });
 
+routes.get('/collaborators', isAuthenticated(), (req: Request, res: Response) => {
+    return getCollaboratorsController.handle(req, res);
+});
+
 routes.get('/collaboratorsByActivity', isAuthenticated(), (req: Request, res: Response) => {
     return getCollaboratorByActivityIdController.handle(req, res);
 });
 
-routes.get('/collaboratorsByUser', isAuthenticated(), (req: Request, res: Response) => {
+routes.get('/collaboratorsByUser/:userId', isAuthenticated(), (req: Request, res: Response) => {
     return getCollaboratorByUserController.handle(req, res);
 })
 
@@ -245,12 +307,12 @@ routes.post('/messageActivity', isAuthenticated(), (req: Request, res: Response)
     return createMessageActivityController.handle(req, res);
 });
 
-routes.get('/messageActivity/activityId', isAuthenticated(), (req: Request, res: Response) => {
+routes.get('/messageActivity/:activityId', isAuthenticated(), (req: Request, res: Response) => {
     return getMessageByActivityIdController.handle(req, res);
 });
 
 routes.get('/messageActivity', isAuthenticated(), (req: Request, res: Response) => {
-    return getAllMessageActivityController.handle(req, res);
+    return getMessageActivityController.handle(req, res);
 });
 
 routes.get('/messageActivity/userId', isAuthenticated(), (req: Request, res: Response) => {
@@ -286,6 +348,11 @@ routes.post('/uploads', isAuthenticated(), upload.single('file'), (req: Request,
 routes.get('/annexActivity', isAuthenticated(), (req: Request, res: Response) => {
     return getAnnexActivityInfoUController.handle(req, res)
 })
+
+routes.get('/annexActivity/:activityId', isAuthenticated(), (req: Request, res: Response) => {
+    return getAnnexsInfoByActivityController.handle(req, res)
+})
+
 
 routes.get('/annexActivity/file', isAuthenticated(), (req: Request, res: Response) => {
     return getAnnexFilecontroller.handle(req, res)

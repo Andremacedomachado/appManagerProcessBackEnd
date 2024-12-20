@@ -5,14 +5,14 @@ import { ICreateMessageActivityRequestDTO } from "./CreateMessageActivtyDTO";
 export class CreateMessageActivityUseCase {
     constructor(private messageActivityRepository: IMessageActivityRepository) { }
 
-    async execute(messageData: ICreateMessageActivityRequestDTO) {
+    async execute({ content, activity_id, type_message, user_id, publication_date, updated_at }: ICreateMessageActivityRequestDTO) {
         const messageActivityInMemory = MessageActivity.create({
-            content: messageData.content,
-            publication_date: messageData.publication_date ?? new Date(),
-            updated_at: messageData.updated_at ?? new Date(),
-            type_message: messageData.typeMessage as unknown as TYPEMESSAGE,
-            activity_id: messageData.activityId,
-            user_id: messageData.userId
+            content,
+            publication_date,
+            updated_at,
+            type_message,
+            activity_id,
+            user_id
         })
         const messageIdOrNull = await this.messageActivityRepository.save(messageActivityInMemory);
         if (!messageIdOrNull) {

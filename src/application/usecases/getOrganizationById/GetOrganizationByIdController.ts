@@ -11,8 +11,8 @@ export class GetOrganizationByIdController {
 
     async handle(request: Request, response: Response) {
         try {
-            const { organizationId } = GetOrganizationIdRequestSchema.parse(request.body)
-            const organizationOrError = await this.getOrganizationByIdUseCase.execute(organizationId);
+            const { id } = GetOrganizationIdRequestSchema.parse(request.params)
+            const organizationOrError = await this.getOrganizationByIdUseCase.execute(id);
             if (organizationOrError instanceof Error) {
                 return response.status(500).json({ error: organizationOrError.message });
             }

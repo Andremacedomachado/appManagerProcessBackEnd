@@ -106,7 +106,7 @@ export class PrismaActivityIntegrationRepository implements IActivityIntegration
 
 
         const activitiesInMemory = activitiesInDatabase.map(record => {
-            const { id, title, responsible_id, created_at, description, due_date, progress_status, start_date, updated_at, type_node } = record
+            const { id, title, responsible_id, created_at, description, due_date, progress_status, start_date, updated_at, type_node, conclusion_date, project_id, sector_id } = record
             return Activity.create({
                 title,
                 description: !description ? undefined : description,
@@ -116,7 +116,10 @@ export class PrismaActivityIntegrationRepository implements IActivityIntegration
                 due_date: !due_date ? undefined : due_date,
                 start_date: !start_date ? undefined : start_date,
                 progress_status: progress_status as STATUSACTIVITY,
-                type_node: type_node as unknown as TYPENODE
+                type_node: type_node as unknown as TYPENODE,
+                conclusion_date,
+                project_id,
+                sector_id
             }, id);
 
         })
@@ -168,7 +171,7 @@ export class PrismaActivityIntegrationRepository implements IActivityIntegration
         if (!activityInDatabase) {
             return null
         };
-        const { id, title, responsible_id, created_at, description, due_date, progress_status, start_date, updated_at, type_node } = activityInDatabase
+        const { id, title, responsible_id, created_at, description, due_date, progress_status, start_date, updated_at, type_node, conclusion_date, project_id, sector_id } = activityInDatabase
         const activityInMemory = Activity.create({
             title,
             description: !description ? undefined : description,
@@ -178,7 +181,10 @@ export class PrismaActivityIntegrationRepository implements IActivityIntegration
             due_date: !due_date ? undefined : due_date,
             start_date: !start_date ? undefined : start_date,
             progress_status: progress_status as STATUSACTIVITY,
-            type_node: type_node as unknown as TYPENODE
+            type_node: type_node as unknown as TYPENODE,
+            conclusion_date,
+            project_id,
+            sector_id
         }, id);
 
         return activityInMemory
